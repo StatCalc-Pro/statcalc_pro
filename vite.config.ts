@@ -5,7 +5,14 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/StatCalc-Pro/",
+  // Use absolute base so assets are referenced from the site root.
+  // Relative base ("./") causes asset requests to be relative to the
+  // current URL path which breaks client-side routed pages on Vercel
+  // (they try to load e.g. /dashboard/assets/...).
+  base: "/",
+   build: {
+    outDir: 'dist', // pasta de saída do build
+  },
   server: {
     host: "::",
     port: 8080,
