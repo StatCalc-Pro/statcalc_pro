@@ -11,5 +11,6 @@ createRoot(document.getElementById("root")!).render(
   // when the URL didn't start with that basename.
   <BrowserRouter basename={import.meta.env.BASE_URL}>
     <App />
+    <Analytics />
   </BrowserRouter>
 );

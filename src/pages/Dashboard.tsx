@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, FileUp, BarChart3, FileText, TrendingUp, Crown, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { trackEvent } from "@/lib/vercel-analytics";
 
 const Dashboard = () => {
   // Load recent analyses from localStorage/history (fallback to sessionStorage)
@@ -35,6 +36,12 @@ const Dashboard = () => {
     } catch (e) {
       console.error("Falha ao carregar análises recentes", e);
     }
+  }, []);
+
+  // Track a dashboard view event when the component mounts.
+  useEffect(() => {
+    // Avoid sending sensitive identifiers; prefer anonymous IDs or none.
+    trackEvent("Dashboard_view", { plan: "trial" });
   }, []);
 
   const totalAnalyses = history.length;
