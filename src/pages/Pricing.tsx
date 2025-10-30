@@ -96,7 +96,7 @@ const Pricing = () => {
             </Link>
           </nav>
 
-          <Link to="/calculator">
+          <Link to="/Auth">
             <Button>Login</Button>
           </Link>
         </div>
