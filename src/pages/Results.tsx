@@ -3,7 +3,11 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileImage, FileSpreadsheet, FileText, Search } from "lucide-react";
+import { FileImage, FileSpreadsheet, FileText, Search, Crown } from "lucide-react";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import { getUpgradeMessage } from "@/lib/subscription";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 import * as XLSX from "xlsx";
 import {
   ResponsiveContainer,
@@ -31,7 +35,9 @@ const Results = () => {
   const [studies, setStudies] = useState<any[]>([]);
   const [selectedStudy, setSelectedStudy] = useState<string | number | null>(null);
   const [summary, setSummary] = useState<{ avg_sensitivity?: number; avg_specificity?: number; auc?: number }>({});
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const itemsPerPage = 10;
+  const { hasFeature } = useSubscription();
 
   useEffect(() => {
     const loadFromSession = () => {
@@ -140,6 +146,10 @@ const Results = () => {
             Exportar (Imprimir)
           </Button>
           <Button variant="outline" size="sm" onClick={() => {
+            if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS') && !hasFeature('advanced_export')) {
+              setShowUpgradeModal(true);
+              return;
+            }
             // export currently filtered studies to Excel
             try {
               const payload = filteredStudies.map((s) => ({
@@ -158,7 +168,7 @@ const Results = () => {
             } catch (e) {
               console.error("Erro ao exportar Excel", e);
             }
-          }}>
+          }} disabled={!hasFeature('advanced_export')}>
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             Exportar Excel
           </Button>
@@ -426,9 +436,15 @@ const Results = () => {
         </CardContent>
       </Card>
 
+      {isFeatureEnabled('SHOW_UPGRADE_PROMPTS') && (
+        <UpgradeModal 
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          title="Recurso Premium"
+          description="Este recurso está disponível apenas nos planos pagos."
+        />
+      )}
     </div>
-
-    
   );
 };
 

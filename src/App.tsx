@@ -19,6 +19,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Success from "./pages/Sucess";
 import { trackPageview } from "@/lib/vercel-analytics";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 
 const queryClient = new QueryClient();
 
@@ -44,7 +45,7 @@ const App = () => {
           <Route path="/help" element={<Layout><Help /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
           <Route path="/account" element={<Layout><ProtectedRoute><Account /></ProtectedRoute></Layout>} />
-          <Route path="/pricing" element={<Pricing />} />
+          {isFeatureEnabled('SHOW_PRICING_PAGE') && <Route path="/pricing" element={<Pricing />} />}
           <Route path="/auth" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />

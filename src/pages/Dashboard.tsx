@@ -7,8 +7,11 @@ import { Link } from "react-router-dom";
 import { trackEvent } from "@/lib/vercel-analytics";
 import { generateMockData } from "@/lib/mockGenerator";
 import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 
 const Dashboard = () => {
+  const { userPlan } = useSubscription();
   // Load recent analyses from localStorage/history (fallback to sessionStorage)
   const [history, setHistory] = useState<any[]>([]);
   const [recentAnalyses, setRecentAnalyses] = useState<Array<{ id: number; name: string; date: string; auc: number }>>([]);
@@ -73,25 +76,27 @@ const Dashboard = () => {
           </p>
         </div>
         
-        <Link to="/pricing">
-          <Card className="cursor-pointer hover:border-primary transition-colors">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="bg-primary/10 p-2 rounded-lg">
-                <Crown className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">Plano Atual</span>
-                  <Badge variant="outline" className="text-xs">Teste Grátis</Badge>
+        {isFeatureEnabled('SHOW_PRICING_PAGE') && userPlan.type === 'free' && (
+          <Link to="/pricing">
+            <Card className="cursor-pointer hover:border-primary transition-colors">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Crown className="h-5 w-5 text-primary" />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Faça upgrade para desbloquear mais recursos
-                </p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground ml-2" />
-            </CardContent>
-          </Card>
-        </Link>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-sm">Plano Atual</span>
+                    <Badge variant="outline" className="text-xs">Teste Grátis</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Faça upgrade para desbloquear mais recursos
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground ml-2" />
+              </CardContent>
+            </Card>
+          </Link>
+        )}
         </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>

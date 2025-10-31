@@ -1,7 +1,12 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { BarChart3, Bell, Settings, User, HelpCircle } from "lucide-react";
+import { BarChart3, Bell, Settings, User, LogOut } from "lucide-react";
+import { DevPanel } from "./DevPanel";
+import { useAuth } from "@/lib/auth";
+import { Badge } from "./ui/badge";
+import { useSubscription } from "@/hooks/useSubscription";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,6 +14,8 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const { userPlan, hasFeature } = useSubscription();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -67,22 +74,82 @@ const Layout = ({ children }: LayoutProps) => {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
-             <Link to="/account">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <User className="h-5 w-5" />
-              </Button>
-            </Link>
+            {user && isFeatureEnabled('SHOW_PLAN_BADGES') && (
+              <div className="flex items-center gap-2 mr-2">
+                <Badge variant={userPlan.type === 'free' ? 'secondary' : userPlan.type === 'god_master' ? 'destructive' : 'default'}>
+                  {userPlan.type === 'free' ? 'Gratuito' : 
+                   userPlan.type === 'pro' ? 'Pro' : 
+                   userPlan.type === 'enterprise' ? 'Enterprise' :
+                   userPlan.type === 'god_master' ? 'GOD MASTER' : userPlan.type}
+                </Badge>
+                <span className="text-sm text-muted-foreground hidden md:block">
+                  {user.email}
+                </span>
+              </div>
+            )}
+            
+            {isFeatureEnabled('REQUIRE_AUTH') ? (
+              user ? (
+                <>
+                  <Link to="/account">
+                    <Button variant="ghost" size="icon">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => {
+                      console.log('Logout clicked');
+                      signOut().then(() => {
+                        console.log('Logout successful');
+                        window.location.reload();
+                      }).catch(err => {
+                        console.error('Logout error:', err);
+                        window.location.reload();
+                      });
+                    }}
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth">
+                  <Button>Entrar</Button>
+                </Link>
+              )
+            ) : (
+              user && (
+                <>
+                  <Link to="/account">
+                    <Button variant="ghost" size="icon">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => {
+                      signOut().then(() => {
+                        window.location.reload();
+                      }).catch(() => {
+                        window.location.reload();
+                      });
+                    }}
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </>
+              )
+            )}
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-6 py-8">{children}</main>
+      
+      {/* Dev Panel - apenas para GOD MASTER */}
+      {isFeatureEnabled('ENABLE_DEV_PANEL') && user && hasFeature('dev_panel') && <DevPanel />}
 
       <footer className="border-t bg-card mt-16">
         <div className="container mx-auto px-6 py-8">
