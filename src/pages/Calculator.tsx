@@ -1,20 +1,26 @@
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileUp, X, Sparkles, BarChart3, Download } from "lucide-react";
+import { FileUp, X, Sparkles, BarChart3, Download, Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { computeMetrics, exportResultsJson } from "@/lib/metrics";
 import { Input } from "@/components/ui/input";
 import { generateMockData } from "@/lib/mockGenerator";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import { getUpgradeMessage } from "@/lib/subscription";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 
 const Calculator = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [analysisName, setAnalysisName] = useState<string>("");
   const [pendingResult, setPendingResult] = useState<any | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
+  const { userPlan, canCreateAnalysis, incrementUsage } = useSubscription();
 
   const handleFileSelect = () => {
     inputRef.current?.click();
@@ -28,7 +34,8 @@ const Calculator = () => {
       return;
     }
     try {
-      toast.loading("Processando arquivo no navegador...");
+      const loadingToast = toast.loading("Processando arquivo no navegador...");
+      
       // read file as array buffer and parse using xlsx in browser
       const arrayBuffer = await file.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: "array" });
@@ -43,14 +50,23 @@ const Calculator = () => {
       setPendingResult(json);
       setSelectedFile(file.name);
       setAnalysisName(file.name);
+      
+      toast.dismiss(loadingToast);
       toast.success("Arquivo processado — edite o nome se quiser e clique 'Process Data'");
     } catch (err) {
       console.error(err);
+      toast.dismiss();
       toast.error("Falha ao processar arquivo");
     }
   };
 
   const handleProcess = () => {
+    // Verificar se pode criar análise (apenas se limitações estiverem ativas)
+    if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS') && !canCreateAnalysis()) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     // use pendingResult if available, otherwise fallback to sessionStorage (backwards compat)
     const json = pendingResult ?? (() => {
       try {
@@ -82,6 +98,11 @@ const Calculator = () => {
       console.error("Falha ao atualizar histórico de análises", e);
     }
 
+    // Incrementar uso (apenas se limitações estiverem ativas)
+    if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS')) {
+      incrementUsage();
+    }
+    
     toast.success("Processamento salvo");
     // clear pending result and navigate
     setPendingResult(null);
@@ -98,6 +119,15 @@ const Calculator = () => {
         <p className="text-muted-foreground text-lg">
           Uma ferramenta simples para calcular fórmulas estatísticas dos seus dados.
         </p>
+        
+        {isFeatureEnabled('SHOW_PLAN_BADGES') && userPlan.type === 'free' && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-primary/20">
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <Crown className="h-4 w-4 text-primary" />
+              <span>Plano Gratuito: {userPlan.analysesUsed}/{userPlan.analysesLimit} análises usadas</span>
+            </div>
+          </div>
+        )}
       </div>
 
       <Card>
@@ -209,6 +239,15 @@ const Calculator = () => {
             </CardContent>
           </Card>
         </>
+      )}
+      
+      {isFeatureEnabled('SHOW_UPGRADE_PROMPTS') && (
+        <UpgradeModal 
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          title="Limite de Análises Atingido"
+          description={getUpgradeMessage('unlimited_analyses')}
+        />
       )}
     </div>
   );

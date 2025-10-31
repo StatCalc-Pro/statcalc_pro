@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+import { initializeUserData } from './userInit'
 
 type User = any
 
@@ -35,8 +36,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getUser()
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
+      
+      // Inicializar dados apenas no login (não no signup para evitar conflitos)
+      if (event === 'SIGNED_IN' && session?.user) {
+        setTimeout(async () => {
+          await initializeUserData(session.user.id)
+        }, 1000)
+      }
+      
       setLoading(false)
     })
 
@@ -57,9 +66,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signOut = async () => {
-    const res = await supabase.auth.signOut()
+    console.log('Starting logout...')
+    
+    // Limpar estado local imediatamente
     setUser(null)
-    return res
+    localStorage.removeItem('userPlan')
+    localStorage.clear()
+    
+    try {
+      // Tentar logout no Supabase com timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 3000)
+      )
+      
+      const logoutPromise = supabase.auth.signOut()
+      
+      await Promise.race([logoutPromise, timeoutPromise])
+      console.log('Supabase logout successful')
+    } catch (error) {
+      console.log('Supabase logout failed or timeout, but local logout completed:', error)
+    }
+    
+    console.log('Logout completed')
+    return { error: null }
   }
 
   return (
