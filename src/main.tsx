@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
 import { Analytics } from "@vercel/analytics/react"
+import { AuthProvider } from "@/lib/auth"
 
 createRoot(document.getElementById("root")!).render(
   // Use Vite's BASE_URL so the router basename matches the built base.
@@ -10,7 +11,9 @@ createRoot(document.getElementById("root")!).render(
   // hardcoding "/StatCalc-Pro" which caused the app to render blank
   // when the URL didn't start with that basename.
   <BrowserRouter basename={import.meta.env.BASE_URL}>
-    <App />
-    <Analytics />
+    <AuthProvider>
+      <App />
+      <Analytics />
+    </AuthProvider>
   </BrowserRouter>
 );

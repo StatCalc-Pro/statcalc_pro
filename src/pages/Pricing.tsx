@@ -8,49 +8,49 @@ import { Link } from "react-router-dom";
 const Pricing = () => {
   const plans = [
     {
-      name: "Free Trial",
-      description: "For individuals getting started.",
-      price: "$0",
-      period: "/ 14 days",
+      name: "Teste Gratuito",
+      description: "Para indivíduos começando.",
+      price: "R$0",
+      period: "/ 14 dias",
       features: [
-        "Basic statistical formulas",
-        "Up to 10 data uploads",
-        "Standard data visualization",
-        "Email support"
+        "Fórmulas estatísticas básicas",
+        "Até 10 uploads de dados",
+        "Visualização padrão de dados",
+        "Suporte por email"
       ],
-      buttonText: "Start Free Trial",
+      buttonText: "Iniciar Teste Gratuito",
       buttonVariant: "outline" as const,
       popular: false
     },
     {
-      name: "Professional",
-      description: "For active researchers and small teams.",
-      price: "$49",
-      period: "/ mo",
+      name: "Profissional",
+      description: "Para pesquisadores ativos e pequenas equipes.",
+      price: "R$149",
+      period: "/ mês",
       features: [
-        "Advanced statistical formulas",
-        "Unlimited data uploads",
-        "Advanced data visualization",
-        "Team collaboration features",
-        "Priority email support"
+        "Fórmulas estatísticas avançadas",
+        "Uploads ilimitados de dados",
+        "Visualização avançada de dados",
+        "Recursos de colaboração em equipe",
+        "Suporte prioritário por email"
       ],
-      buttonText: "Get Started",
+      buttonText: "Começar Agora",
       buttonVariant: "default" as const,
       popular: true
     },
     {
-      name: "Enterprise",
-      description: "For large institutions and clinics.",
-      price: "$99",
-      period: "/ user / mo",
+      name: "Empresarial",
+      description: "Para grandes instituições e clínicas.",
+      price: "R$299",
+      period: "/ usuário / mês",
       features: [
-        "All Professional features",
-        "Custom formula builder",
-        "API access & integrations",
-        "HIPAA compliance",
-        "Dedicated phone support"
+        "Todos os recursos Profissionais",
+        "Construtor de fórmulas personalizado",
+        "Acesso à API e integrações",
+        "Conformidade HIPAA",
+        "Suporte telefônico dedicado"
       ],
-      buttonText: "Contact Sales",
+      buttonText: "Contatar Vendas",
       buttonVariant: "outline" as const,
       popular: false
     }
@@ -58,20 +58,20 @@ const Pricing = () => {
 
   const faqs = [
     {
-      question: "Can I cancel my subscription at any time?",
-      answer: "Yes, you can cancel your subscription at any time from your account settings. Your access will continue until the end of your current billing period."
+      question: "Posso cancelar minha assinatura a qualquer momento?",
+      answer: "Sim, você pode cancelar sua assinatura a qualquer momento nas configurações da sua conta. Seu acesso continuará até o final do período de cobrança atual."
     },
     {
-      question: "What happens at the end of my free trial?",
-      answer: "At the end of your free trial, you'll be prompted to choose a paid plan. Your data will be preserved, and you can seamlessly upgrade to continue using all features."
+      question: "O que acontece no final do meu teste gratuito?",
+      answer: "No final do seu teste gratuito, você será solicitado a escolher um plano pago. Seus dados serão preservados e você pode fazer upgrade facilmente para continuar usando todos os recursos."
     },
     {
-      question: "Is my patient data secure?",
-      answer: "Absolutely. We use industry-standard encryption and follow HIPAA compliance guidelines to ensure your patient data is secure and protected at all times."
+      question: "Meus dados de pacientes estão seguros?",
+      answer: "Absolutamente. Usamos criptografia padrão da indústria e seguimos diretrizes de conformidade HIPAA para garantir que seus dados de pacientes estejam seguros e protegidos o tempo todo."
     },
     {
-      question: "Do you offer discounts for academic institutions?",
-      answer: "Yes, we offer special pricing for academic institutions and research organizations. Please contact our sales team to discuss your specific needs and eligibility."
+      question: "Vocês oferecem descontos para instituições acadêmicas?",
+      answer: "Sim, oferecemos preços especiais para instituições acadêmicas e organizações de pesquisa. Entre em contato com nossa equipe de vendas para discutir suas necessidades específicas e elegibilidade."
     }
   ];
 
@@ -89,15 +89,15 @@ const Pricing = () => {
           
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              Features
+              Recursos
             </Link>
             <Link to="/pricing" className="text-foreground font-medium">
-              Pricing
+              Preços
             </Link>
           </nav>
 
           <Link to="/Auth">
-            <Button>Login</Button>
+            <Button>Entrar</Button>
           </Link>
         </div>
       </header>
@@ -106,10 +106,10 @@ const Pricing = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Powerful Statistical Analysis, Simplified for Medical Research
+            Análise Estatística Poderosa, Simplificada para Pesquisa Médica
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Choose the plan that best fits your research needs and start making data-driven decisions with confidence. All plans are secure and built for professionals.
+            Escolha o plano que melhor se adapta às suas necessidades de pesquisa e comece a tomar decisões baseadas em dados com confiança. Todos os planos são seguros e construídos para profissionais.
           </p>
         </div>
       </section>
@@ -118,9 +118,9 @@ const Pricing = () => {
       <section className="py-16 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Choose Your Plan</h2>
+            <h2 className="text-4xl font-bold mb-4">Escolha Seu Plano</h2>
             <p className="text-muted-foreground text-lg">
-              Simple, transparent pricing for teams of all sizes.
+              Preços simples e transparentes para equipes de todos os tamanhos.
             </p>
           </div>
 
@@ -132,7 +132,7 @@ const Pricing = () => {
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground">Most Popular</Badge>
+                    <Badge className="bg-primary text-primary-foreground">Mais Popular</Badge>
                   </div>
                 )}
                 
@@ -172,7 +172,7 @@ const Pricing = () => {
       {/* FAQ Section */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-3xl">
-          <h2 className="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <h2 className="text-4xl font-bold text-center mb-12">Perguntas Frequentes</h2>
           
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
@@ -192,12 +192,12 @@ const Pricing = () => {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="container mx-auto max-w-3xl text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Elevate Your Research?</h2>
+          <h2 className="text-4xl font-bold mb-6">Pronto para Elevar Sua Pesquisa?</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of medical professionals who trust StatCalc Pro for accurate, efficient, and secure data analysis.
+            Junte-se a milhares de profissionais médicos que confiam no StatCalc Pro para análise de dados precisa, eficiente e segura.
           </p>
           <Button size="lg" className="text-lg px-8">
-            Start Your Free Trial Today
+            Comece Seu Teste Gratuito Hoje
           </Button>
         </div>
       </section>
@@ -212,9 +212,9 @@ const Pricing = () => {
             <span className="text-sm text-muted-foreground">© 2024 StatCalc Pro. All rights reserved.</span>
           </div>
           <div className="flex gap-6 text-sm text-muted-foreground">
-            <Link to="/about" className="hover:text-foreground transition-colors">Terms of Service</Link>
-            <Link to="/about" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link to="/help" className="hover:text-foreground transition-colors">Contact Us</Link>
+            <Link to="/about" className="hover:text-foreground transition-colors">Termos de Serviço</Link>
+            <Link to="/about" className="hover:text-foreground transition-colors">Política de Privacidade</Link>
+            <Link to="/help" className="hover:text-foreground transition-colors">Contato</Link>
           </div>
         </div>
       </footer>

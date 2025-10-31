@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps) => {
                 variant={isActive("/") ? "default" : "ghost"}
                 className="font-medium"
               >
-                Dashboard
+                Painel
               </Button>
             </Link>
             <Link to="/calculator">
@@ -37,7 +37,7 @@ const Layout = ({ children }: LayoutProps) => {
                 variant={isActive("/calculator") ? "default" : "ghost"}
                 className="font-medium"
               >
-                New Calculation
+                Nova Análise
               </Button>
             </Link>
             <Link to="/results">
@@ -45,7 +45,7 @@ const Layout = ({ children }: LayoutProps) => {
                 variant={isActive("/results") ? "default" : "ghost"}
                 className="font-medium"
               >
-                Results
+                Resultados
               </Button>
             </Link>
             <Link to="/help">
@@ -53,7 +53,7 @@ const Layout = ({ children }: LayoutProps) => {
                 variant={isActive("/help") ? "default" : "ghost"}
                 className="font-medium"
               >
-                Help
+                Ajuda
               </Button>
             </Link>
             <Link to="/about">
@@ -61,7 +61,7 @@ const Layout = ({ children }: LayoutProps) => {
                 variant={isActive("/about") ? "default" : "ghost"}
                 className="font-medium"
               >
-                About
+                Sobre
               </Button>
             </Link>
           </nav>
@@ -92,13 +92,13 @@ const Layout = ({ children }: LayoutProps) => {
             </p>
             <div className="flex gap-6 text-sm">
               <a href="#" className="text-muted-foreground hover:text-primary">
-                Terms of Service
+                Termos de Serviço
               </a>
               <a href="#" className="text-muted-foreground hover:text-primary">
-                Privacy Policy
+                Política de Privacidade
               </a>
               <a href="#" className="text-muted-foreground hover:text-primary">
-                Contact Us
+                Contato
               </a>
             </div>
           </div>

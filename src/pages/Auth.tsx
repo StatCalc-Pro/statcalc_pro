@@ -6,10 +6,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
 import { Eye, EyeOff } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -20,8 +22,15 @@ const Auth = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - redirect to dashboard
-    navigate("/");
+    // Perform Supabase sign-in
+    ;(async () => {
+      const { error } = await signIn(loginEmail, loginPassword)
+      if (error) {
+        alert(error.message || 'Erro ao efetuar login')
+        return
+      }
+      navigate('/')
+    })()
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -30,8 +39,15 @@ const Auth = () => {
       alert("Você precisa aceitar os Termos de Uso para continuar.");
       return;
     }
-    // Mock signup - redirect to dashboard
-    navigate("/");
+    ;(async () => {
+      const { data, error } = await signUp(signupEmail, signupPassword, { full_name: signupName })
+      if (error) {
+        alert(error.message || 'Erro ao cadastrar')
+        return
+      }
+      // Supabase may require email confirmation depending on settings.
+      navigate('/')
+    })()
   };
 
   return (

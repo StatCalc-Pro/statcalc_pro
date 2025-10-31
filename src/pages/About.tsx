@@ -11,8 +11,8 @@ const About = () => {
   const team = [
     {
       name: "Lucas Barros",
-      role: "Back-end and AI Software Engineer",
-      description: "Desenvolvedor Back-end, engenheiro de IA e Automações",
+      role: "Desenvolvedor Full-Stack & Engenheiro de IA",
+      description: "Especialista em desenvolvimento de aplicações médicas e ferramentas de análise estatística. Apaixonado por tecnologia que impacta positivamente a área da saúde.",
       initials: "LB",
       image: "/3b54d4ec-c999-48f7-9fa5-f94d05ab2b54.jpg",
     }
@@ -21,30 +21,29 @@ const About = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-12">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-foreground mb-4">About StatCalc Pro</h1>
+        <h1 className="text-4xl font-bold text-foreground mb-4">Sobre o StatCalc Pro</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-          A professional-grade application designed for medical professionals and researchers to
-          perform complex statistical calculations with ease and precision.
+          Uma aplicação profissional desenvolvida para médicos e pesquisadores realizarem
+          cálculos estatísticos complexos com facilidade e precisão.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Our Mission</CardTitle>
+          <CardTitle className="text-2xl">Nossa Missão</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground leading-relaxed">
-            Our mission is to empower medical professionals by providing a reliable, accurate, and
-            user-friendly tool for statistical analysis. We aim to streamline the data
-            interpretation process, enabling clinicians and researchers to make informed decisions
-            based on robust evidence, ultimately contributing to advancements in patient care and
-            medical science.
+            Nossa missão é capacitar profissionais médicos fornecendo uma ferramenta confiável, precisa e
+            fácil de usar para análise estatística. Buscamos simplificar o processo de interpretação de dados,
+            permitindo que clínicos e pesquisadores tomem decisões informadas baseadas em evidências robustas,
+            contribuindo para avanços no cuidado ao paciente e na ciência médica.
           </p>
         </CardContent>
       </Card>
 
       <div>
-        <h2 className="text-3xl font-bold mb-6">Meet the Team</h2>
+        <h2 className="text-3xl font-bold mb-6">Conheça a Equipe</h2>
         <div className="grid gap-6 md:grid-cols-3">
           {team.map((member, i) => (
             <Card key={i}>
@@ -67,60 +66,60 @@ const About = () => {
       </div>
 
       <div>
-        <h2 className="text-3xl font-bold mb-6">Acknowledgements & Disclaimers</h2>
+        <h2 className="text-3xl font-bold mb-6">Agradecimentos e Avisos Legais</h2>
         <Accordion type="single" collapsible className="space-y-2">
           <AccordionItem value="acknowledgements" className="border rounded-lg px-4">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-              Acknowledgements
+              Agradecimentos
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground space-y-2">
               <p>
-                We would like to thank the open-source community and the numerous contributors who
-                have made this project possible. Special recognition goes to the statistical
-                libraries and frameworks that power our calculations.
+                Gostaríamos de agradecer à comunidade open-source e aos inúmeros colaboradores que
+                tornaram este projeto possível. Reconhecimento especial às bibliotecas estatísticas
+                e frameworks que alimentam nossos cálculos.
               </p>
               <p>
-                We are grateful to the medical professionals who provided valuable feedback during
-                the development process, ensuring our tool meets the real-world needs of healthcare
-                providers and researchers.
+                Somos gratos aos profissionais médicos que forneceram feedback valioso durante
+                o processo de desenvolvimento, garantindo que nossa ferramenta atenda às necessidades
+                reais de provedores de saúde e pesquisadores.
               </p>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="privacy" className="border rounded-lg px-4">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-              Data & Privacy
+              Dados e Privacidade
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground space-y-2">
               <p>
-                StatCalc Pro is committed to protecting your data privacy. All uploaded data is
-                encrypted in transit and at rest. We do not store your data beyond the active
-                session unless explicitly saved by the user.
+                O StatCalc Pro está comprometido em proteger a privacidade dos seus dados. Todos os dados
+                carregados são criptografados em trânsito e em repouso. Não armazenamos seus dados além
+                da sessão ativa, a menos que explicitamente salvos pelo usuário.
               </p>
               <p>
-                We comply with HIPAA regulations and international data protection standards. Your
-                data is never shared with third parties for any purpose. For more information,
-                please review our Privacy Policy.
+                Cumprimos com regulamentações HIPAA e padrões internacionais de proteção de dados. Seus
+                dados nunca são compartilhados com terceiros para qualquer propósito. Para mais informações,
+                consulte nossa Política de Privacidade.
               </p>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="disclaimer" className="border rounded-lg px-4">
             <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-              Medical Disclaimer
+              Aviso Médico
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground space-y-2">
               <p>
-                StatCalc Pro is designed as a statistical analysis tool and should not be used as
-                the sole basis for medical decisions. All results should be interpreted by qualified
-                medical professionals in the context of clinical judgment and patient-specific
-                factors.
+                O StatCalc Pro é projetado como uma ferramenta de análise estatística e não deve ser usado
+                como única base para decisões médicas. Todos os resultados devem ser interpretados por
+                profissionais médicos qualificados no contexto do julgamento clínico e fatores específicos
+                do paciente.
               </p>
               <p>
-                While we strive for accuracy, we cannot guarantee that the software is error-free.
-                Users are responsible for validating results and ensuring appropriate application of
-                statistical methods. This tool does not replace professional medical advice,
-                diagnosis, or treatment.
+                Embora nos esforcemos pela precisão, não podemos garantir que o software seja livre de erros.
+                Os usuários são responsáveis por validar resultados e garantir a aplicação apropriada de
+                métodos estatísticos. Esta ferramenta não substitui aconselhamento médico profissional,
+                diagnóstico ou tratamento.
               </p>
             </AccordionContent>
           </AccordionItem>

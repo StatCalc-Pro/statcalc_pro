@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout";
 import ForgotPassword from "./pages/ForgotPassword";
 import Success from "./pages/Sucess";
 import { trackPageview } from "@/lib/vercel-analytics";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -42,12 +43,12 @@ const App = () => {
           <Route path="/results" element={<Layout><Results /></Layout>} />
           <Route path="/help" element={<Layout><Help /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
-          <Route path="/account" element={<Layout><Account /></Layout>} />
+          <Route path="/account" element={<Layout><ProtectedRoute><Account /></ProtectedRoute></Layout>} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/success" element={<Success />} />
+          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, FileUp, BarChart3, FileText, TrendingUp, Crown, Trash2 } from "lucide-react";
+import { ArrowRight, FileUp, BarChart3, FileText, TrendingUp, Crown, Trash2, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackEvent } from "@/lib/vercel-analytics";
+import { generateMockData } from "@/lib/mockGenerator";
+import { toast } from "sonner";
 
 const Dashboard = () => {
   // Load recent analyses from localStorage/history (fallback to sessionStorage)
@@ -65,9 +67,9 @@ const Dashboard = () => {
     <div className="space-y-8">
        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Painel</h1>
           <p className="text-muted-foreground text-lg">
-            Welcome back! Start a new analysis or review your recent calculations.
+            Bem-vindo de volta! Inicie uma nova análise ou revise seus cálculos recentes.
           </p>
         </div>
         
@@ -79,11 +81,11 @@ const Dashboard = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">Current Plan</span>
-                  <Badge variant="outline" className="text-xs">Free Trial</Badge>
+                  <span className="font-semibold text-sm">Plano Atual</span>
+                  <Badge variant="outline" className="text-xs">Teste Grátis</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Upgrade to unlock more features
+                  Faça upgrade para desbloquear mais recursos
                 </p>
               </div>
               <ArrowRight className="h-4 w-4 text-muted-foreground ml-2" />
@@ -94,45 +96,45 @@ const Dashboard = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Analyses</CardTitle>
+            <CardTitle className="text-sm font-medium">Total de Análises</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary">{totalAnalyses}</div>
-            <p className="text-xs text-muted-foreground mt-1">based on local history</p>
+            <p className="text-xs text-muted-foreground mt-1">baseado no histórico local</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. AUC Score</CardTitle>
+            <CardTitle className="text-sm font-medium">AUC Médio</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary">{history.length ? avgAuc.toFixed(2) : "—"}</div>
-            <p className="text-xs text-muted-foreground mt-1">Across stored analyses</p>
+            <p className="text-xs text-muted-foreground mt-1">Entre análises armazenadas</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Data Processed</CardTitle>
+            <CardTitle className="text-sm font-medium">Dados Processados</CardTitle>
             <FileUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary">{totalRecords.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">Records analyzed (sum of studies)</p>
+            <p className="text-xs text-muted-foreground mt-1">Registros analisados (soma dos estudos)</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reports Generated</CardTitle>
+            <CardTitle className="text-sm font-medium">Relatórios Gerados</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary">{reportsGenerated}</div>
-            <p className="text-xs text-muted-foreground mt-1">Saved analyses (local)</p>
+            <p className="text-xs text-muted-foreground mt-1">Análises salvas (local)</p>
           </CardContent>
         </Card>
       </div>
@@ -140,31 +142,47 @@ const Dashboard = () => {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Start</CardTitle>
-            <CardDescription>Begin a new statistical analysis</CardDescription>
+            <CardTitle>Início Rápido</CardTitle>
+            <CardDescription>Comece uma nova análise estatística</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Link to="/calculator">
               <Button className="w-full justify-start gap-2" size="lg">
                 <FileUp className="h-5 w-5" />
-                Upload New Dataset
+                Carregar Novo Dataset
                 <ArrowRight className="ml-auto h-4 w-4" />
               </Button>
             </Link>
             <Link to="/help">
               <Button variant="outline" className="w-full justify-start gap-2" size="lg">
                 <FileText className="h-5 w-5" />
-                View Documentation
+                Ver Documentação
                 <ArrowRight className="ml-auto h-4 w-4" />
               </Button>
             </Link>
+            <Button 
+              variant="secondary" 
+              className="w-full justify-start gap-2" 
+              size="lg"
+              onClick={() => {
+                try {
+                  const fileName = generateMockData();
+                  toast.success(`Planilha mock gerada: ${fileName}`);
+                } catch (error) {
+                  toast.error("Erro ao gerar planilha mock");
+                }
+              }}
+            >
+              <Download className="h-5 w-5" />
+              Gerar Dados Mock
+            </Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Analyses</CardTitle>
-            <CardDescription>Your latest statistical calculations</CardDescription>
+            <CardTitle>Análises Recentes</CardTitle>
+            <CardDescription>Seus cálculos estatísticos mais recentes</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -181,7 +199,7 @@ const Dashboard = () => {
                     <p className="text-sm font-bold text-primary">AUC: {analysis.auc}</p>
                     <Link to="/results">
                       <Button variant="link" size="sm" className="h-auto p-0 text-xs">
-                        View Results
+                        Ver Resultados
                       </Button>
                     </Link>
                     <Button variant="ghost" size="sm" onClick={() => removeAnalysis(analysis.id)} title="Remover do histórico">
