@@ -2,31 +2,61 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { STRIPE_PRICES } from "@/lib/stripe";
+import { useAuth } from "@/lib/auth";
+import { toast } from "@/hooks/use-toast";
 
 const Pricing = () => {
+  const { createCheckoutSession, loading } = useStripeCheckout();
+  const { user } = useAuth();
+
+  const handleSubscribe = async (priceId: string) => {
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Faça login para assinar um plano",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await createCheckoutSession(priceId);
+    } catch (error) {
+      toast({
+        title: "Erro no checkout",
+        description: "Tente novamente em alguns instantes",
+        variant: "destructive"
+      });
+    }
+  };
+
   const plans = [
     {
       name: "Teste Gratuito",
-      description: "Para indivíduos começando.",
+      description: "Para testar a plataforma.",
       price: "R$0",
-      period: "/ 14 dias",
+      period: "/ mês",
+      priceId: STRIPE_PRICES.TEST_FREE,
       features: [
         "Fórmulas estatísticas básicas",
         "Até 10 uploads de dados",
         "Visualização padrão de dados",
         "Suporte por email"
       ],
-      buttonText: "Iniciar Teste Gratuito",
+      buttonText: "Testar Gratis",
       buttonVariant: "outline" as const,
       popular: false
     },
     {
-      name: "Profissional",
+      name: "Premium",
       description: "Para pesquisadores ativos e pequenas equipes.",
-      price: "R$149",
+      price: "R$59",
       period: "/ mês",
+      priceId: STRIPE_PRICES.PRO_MONTHLY,
       features: [
         "Fórmulas estatísticas avançadas",
         "Uploads ilimitados de dados",
@@ -37,22 +67,6 @@ const Pricing = () => {
       buttonText: "Começar Agora",
       buttonVariant: "default" as const,
       popular: true
-    },
-    {
-      name: "Empresarial",
-      description: "Para grandes instituições e clínicas.",
-      price: "R$299",
-      period: "/ usuário / mês",
-      features: [
-        "Todos os recursos Profissionais",
-        "Construtor de fórmulas personalizado",
-        "Acesso à API e integrações",
-        "Conformidade HIPAA",
-        "Suporte telefônico dedicado"
-      ],
-      buttonText: "Contatar Vendas",
-      buttonVariant: "outline" as const,
-      popular: false
     }
   ];
 
@@ -124,7 +138,7 @@ const Pricing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {plans.map((plan) => (
               <Card 
                 key={plan.name} 
@@ -150,8 +164,21 @@ const Pricing = () => {
                     className="w-full" 
                     variant={plan.buttonVariant}
                     size="lg"
+                    onClick={() => {
+                      if (plan.priceId) {
+                        handleSubscribe(plan.priceId);
+                      }
+                    }}
+                    disabled={loading}
                   >
-                    {plan.buttonText}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processando...
+                      </>
+                    ) : (
+                      plan.buttonText
+                    )}
                   </Button>
 
                   <ul className="space-y-3">
