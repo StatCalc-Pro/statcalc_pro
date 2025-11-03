@@ -14,7 +14,7 @@ import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import Account from "./pages/Account";
 import Auth from "./pages/Auth";
-import Checkout from "./pages/Checkout";
+
 import ForgotPassword from "./pages/ForgotPassword";
 import Success from "./pages/Sucess";
 import { trackPageview } from "@/lib/vercel-analytics";
@@ -48,7 +48,7 @@ const App = () => {
           {isFeatureEnabled('SHOW_PRICING_PAGE') && <Route path="/pricing" element={<Pricing />} />}
           <Route path="/auth" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+
           <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
