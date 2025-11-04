@@ -44,7 +44,7 @@ const App = () => {
           <Route path="/" element={isFeatureEnabled('ENABLE_ONBOARDING') ? <Landing /> : <Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
           <Route path="/dashboard" element={<Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
           {isFeatureEnabled('ENABLE_ONBOARDING') && <Route path="/landing" element={<Landing />} />}
-          {isFeatureEnabled('ENABLE_ONBOARDING') && <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />}
+          {(isFeatureEnabled('ENABLE_ONBOARDING') || isFeatureEnabled('SHOW_ONBOARDING_FOR_NEW_USERS')) && <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />}
           <Route path="/calculator" element={<Layout><ProtectedRoute><Calculator /></ProtectedRoute></Layout>} />
           <Route path="/results" element={<Layout><ProtectedRoute><Results /></ProtectedRoute></Layout>} />
           <Route path="/help" element={<Layout><Help /></Layout>} />

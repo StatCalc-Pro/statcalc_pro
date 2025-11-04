@@ -25,12 +25,20 @@ const Auth = () => {
     e.preventDefault();
     // Perform Supabase sign-in
     ;(async () => {
-      const { error } = await signIn(loginEmail, loginPassword)
+      const { data, error } = await signIn(loginEmail, loginPassword)
       if (error) {
         alert(error.message || 'Erro ao efetuar login')
         return
       }
-      navigate('/dashboard')
+      
+      // Verificar se é primeira vez do usuário (criado recentemente)
+      const isNewUser = data.user && new Date(data.user.created_at).getTime() > Date.now() - 24 * 60 * 60 * 1000 // 24h
+      
+      if (isNewUser && isFeatureEnabled('SHOW_ONBOARDING_FOR_NEW_USERS')) {
+        navigate('/onboarding')
+      } else {
+        navigate('/dashboard')
+      }
     })()
   };
 
@@ -46,8 +54,22 @@ const Auth = () => {
         alert(error.message || 'Erro ao cadastrar')
         return
       }
-      // Supabase may require email confirmation depending on settings.
-      navigate(isFeatureEnabled('ENABLE_ONBOARDING') ? '/onboarding' : '/dashboard')
+      
+      // Mostrar aviso sobre validação de email
+      alert('Conta criada com sucesso! Verifique seu email para confirmar a conta antes de fazer login.')
+      
+      // Se o usuário foi criado mas precisa confirmar email, não redirecionar ainda
+      if (data.user && !data.user.email_confirmed_at) {
+        // Usuário precisa confirmar email primeiro
+        return
+      }
+      
+      // Se confirmação automática, redirecionar para onboarding se for novo usuário
+      if (isFeatureEnabled('SHOW_ONBOARDING_FOR_NEW_USERS')) {
+        navigate('/onboarding')
+      } else {
+        navigate('/dashboard')
+      }
     })()
   };
 

@@ -14,6 +14,7 @@ export const FEATURE_FLAGS = {
   
   // Onboarding
   ENABLE_ONBOARDING: true, // true = mostra onboarding, false = esconde
+  SHOW_ONBOARDING_FOR_NEW_USERS: true, // true = mostra onboarding para novos usuários
 } as const;
 
 export const isFeatureEnabled = (flag: keyof typeof FEATURE_FLAGS): boolean => {
