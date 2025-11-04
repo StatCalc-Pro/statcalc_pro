@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { isFeatureEnabled } from "@/lib/featureFlags";
 import { Eye, EyeOff } from "lucide-react";
 
 const Auth = () => {
@@ -29,7 +30,7 @@ const Auth = () => {
         alert(error.message || 'Erro ao efetuar login')
         return
       }
-      navigate('/')
+      navigate('/dashboard')
     })()
   };
 
@@ -46,7 +47,7 @@ const Auth = () => {
         return
       }
       // Supabase may require email confirmation depending on settings.
-      navigate('/')
+      navigate(isFeatureEnabled('ENABLE_ONBOARDING') ? '/onboarding' : '/dashboard')
     })()
   };
 

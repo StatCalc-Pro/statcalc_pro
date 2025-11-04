@@ -2,8 +2,8 @@
 export const FEATURE_FLAGS = {
   // Monetização
   ENABLE_SUBSCRIPTION_LIMITS: false, // true = limita uso, false = uso livre
-  SHOW_PRICING_PAGE: false, // true = mostra preços, false = esconde
-  REQUIRE_AUTH: false, // true = obriga login, false = opcional
+  SHOW_PRICING_PAGE: true, // true = mostra preços, false = esconde
+  REQUIRE_AUTH: true, // true = obriga login, false = opcional
   
   // UI/UX
   SHOW_UPGRADE_PROMPTS: false, // true = mostra modais de upgrade, false = esconde
@@ -11,13 +11,16 @@ export const FEATURE_FLAGS = {
   
   // Admin
   ENABLE_DEV_PANEL: true, // sempre true para GOD MASTER
+  
+  // Onboarding
+  ENABLE_ONBOARDING: true, // true = mostra onboarding, false = esconde
 } as const;
 
 export const isFeatureEnabled = (flag: keyof typeof FEATURE_FLAGS): boolean => {
   return FEATURE_FLAGS[flag];
 };
 
-// Helper para verificar se está em modo produção livre
-export const isProductionFreeMode = (): boolean => {
+  // Helper para verificar se está em modo produção livre
+  export const isProductionFreeMode = (): boolean => {
   return !FEATURE_FLAGS.ENABLE_SUBSCRIPTION_LIMITS && !FEATURE_FLAGS.REQUIRE_AUTH;
 };

@@ -23,7 +23,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-6">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded bg-primary">
               <BarChart3 className="h-5 w-5 text-primary-foreground" />
             </div>
@@ -31,9 +31,9 @@ const Layout = ({ children }: LayoutProps) => {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
-            <Link to="/">
+            <Link to="/dashboard">
               <Button
-                variant={isActive("/") ? "default" : "ghost"}
+                variant={isActive("/dashboard") ? "default" : "ghost"}
                 className="font-medium"
               >
                 Painel
@@ -103,10 +103,10 @@ const Layout = ({ children }: LayoutProps) => {
                       console.log('Logout clicked');
                       signOut().then(() => {
                         console.log('Logout successful');
-                        window.location.reload();
+                        window.location.href = '/';
                       }).catch(err => {
                         console.error('Logout error:', err);
-                        window.location.reload();
+                        window.location.href = '/';
                       });
                     }}
                   >
@@ -131,9 +131,9 @@ const Layout = ({ children }: LayoutProps) => {
                     size="icon" 
                     onClick={() => {
                       signOut().then(() => {
-                        window.location.reload();
+                        window.location.href = '/';
                       }).catch(() => {
-                        window.location.reload();
+                        window.location.href = '/';
                       });
                     }}
                   >

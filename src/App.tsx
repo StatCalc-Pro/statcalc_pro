@@ -6,6 +6,8 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
+import Onboarding from "./pages/Onboarding";
 import Calculator from "./pages/Calculator";
 import Results from "./pages/Results";
 import Help from "./pages/Help";
@@ -39,9 +41,12 @@ const App = () => {
         <Toaster />
         <Sonner />
         <Routes>
-          <Route path="/" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/calculator" element={<Layout><Calculator /></Layout>} />
-          <Route path="/results" element={<Layout><Results /></Layout>} />
+          <Route path="/" element={isFeatureEnabled('ENABLE_ONBOARDING') ? <Landing /> : <Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
+          <Route path="/dashboard" element={<Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
+          {isFeatureEnabled('ENABLE_ONBOARDING') && <Route path="/landing" element={<Landing />} />}
+          {isFeatureEnabled('ENABLE_ONBOARDING') && <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />}
+          <Route path="/calculator" element={<Layout><ProtectedRoute><Calculator /></ProtectedRoute></Layout>} />
+          <Route path="/results" element={<Layout><ProtectedRoute><Results /></ProtectedRoute></Layout>} />
           <Route path="/help" element={<Layout><Help /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
           <Route path="/account" element={<Layout><ProtectedRoute><Account /></ProtectedRoute></Layout>} />
