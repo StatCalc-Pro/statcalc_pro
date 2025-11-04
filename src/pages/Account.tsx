@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,18 +7,33 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { User, CreditCard, Bell, Shield, Eye, EyeOff } from "lucide-react";
+import { User, CreditCard, Bell, Shield, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { supabase } from "@/lib/supabaseClient";
 
 const Account = () => {
   const { toast } = useToast();
+  const { user, updateProfile } = useAuth();
+  const { userPlan, subscription, loading: subscriptionLoading } = useSubscription();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Personal Info State
-  const [name, setName] = useState("Dr. João Silva");
-  const [email, setEmail] = useState("joao.silva@email.com");
-  const [phone, setPhone] = useState("(11) 98765-4321");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  // Load user data
+  useEffect(() => {
+    if (user) {
+      setName(user.user_metadata?.full_name || "");
+      setEmail(user.email || "");
+      setPhone(user.user_metadata?.phone || "");
+    }
+  }, [user]);
 
   // Password State
   const [currentPassword, setCurrentPassword] = useState("");
@@ -29,16 +44,39 @@ const Account = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [updateNotifications, setUpdateNotifications] = useState(true);
 
-  const handleSavePersonalInfo = (e: React.FormEvent) => {
+  const handleSavePersonalInfo = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Dados atualizados!",
-      description: "Suas informações pessoais foram salvas com sucesso.",
-    });
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        email: email,
+        data: {
+          full_name: name,
+          phone: phone
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Dados atualizados!",
+        description: "Suas informações pessoais foram salvas com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao atualizar dados",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (newPassword !== confirmPassword) {
       toast({
         title: "Erro",
@@ -47,13 +85,33 @@ const Account = () => {
       });
       return;
     }
-    toast({
-      title: "Senha alterada!",
-      description: "Sua senha foi atualizada com sucesso.",
-    });
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Senha alterada!",
+        description: "Sua senha foi atualizada com sucesso.",
+      });
+      
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao alterar senha",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveNotifications = (e: React.FormEvent) => {
@@ -144,7 +202,10 @@ const Account = () => {
                   <Button type="button" variant="outline">
                     Cancelar
                   </Button>
-                  <Button type="submit">Salvar Alterações</Button>
+                  <Button type="submit" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Salvar Alterações
+                  </Button>
                 </div>
               </form>
             </CardContent>
@@ -222,7 +283,10 @@ const Account = () => {
                   <Button type="button" variant="outline">
                     Cancelar
                   </Button>
-                  <Button type="submit">Alterar Senha</Button>
+                  <Button type="submit" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Alterar Senha
+                  </Button>
                 </div>
               </form>
             </CardContent>
@@ -239,54 +303,87 @@ const Account = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold">Plano Profissional</h3>
-                    <Badge>Ativo</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    R$ 99,90 / mês
-                  </p>
+              {subscriptionLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
-                <Button asChild variant="outline">
-                  <Link to="/pricing">Alterar Plano</Link>
-                </Button>
-              </div>
+              ) : (
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold">
+                        Plano {userPlan.type === 'free' ? 'Gratuito' : 
+                               userPlan.type === 'pro' ? 'Premium' : 
+                               userPlan.type === 'enterprise' ? 'Enterprise' :
+                               userPlan.type === 'god_master' ? 'GOD MASTER' : userPlan.type}
+                      </h3>
+                      <Badge variant={subscription?.status === 'active' ? 'default' : 'secondary'}>
+                        {subscription?.status === 'active' ? 'Ativo' : 
+                         subscription?.status === 'canceled' ? 'Cancelado' :
+                         subscription?.status === 'past_due' ? 'Vencido' : 'Inativo'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {userPlan.type === 'free' ? 'Gratuito' : 'R$ 59,00 / mês'}
+                    </p>
+                  </div>
+                  <Button asChild variant="outline">
+                    <Link to="/pricing">Alterar Plano</Link>
+                  </Button>
+                </div>
+              )}
 
               <Separator />
 
-              <div className="space-y-4">
-                <h4 className="font-semibold">Detalhes da Assinatura</h4>
-                <div className="grid gap-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status</span>
-                    <span className="font-medium text-success">Ativo</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Data de início</span>
-                    <span className="font-medium">23/09/2024</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Próxima cobrança</span>
-                    <span className="font-medium">24/10/2025</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Método de pagamento</span>
-                    <span className="font-medium">•••• 4321</span>
+              {subscription && (
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Detalhes da Assinatura</h4>
+                  <div className="grid gap-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Status</span>
+                      <span className={`font-medium ${
+                        subscription.status === 'active' ? 'text-green-600' : 
+                        subscription.status === 'canceled' ? 'text-red-600' : 'text-yellow-600'
+                      }`}>
+                        {subscription.status === 'active' ? 'Ativo' : 
+                         subscription.status === 'canceled' ? 'Cancelado' :
+                         subscription.status === 'past_due' ? 'Vencido' : subscription.status}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Data de início</span>
+                      <span className="font-medium">
+                        {subscription.created_at ? new Date(subscription.created_at).toLocaleDateString('pt-BR') : '-'}
+                      </span>
+                    </div>
+                    {subscription.current_period_end && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Próxima cobrança</span>
+                        <span className="font-medium">
+                          {new Date(subscription.current_period_end).toLocaleDateString('pt-BR')}
+                        </span>
+                      </div>
+                    )}
+                    {subscription.stripe_customer_id && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">ID do Cliente</span>
+                        <span className="font-medium font-mono text-xs">
+                          {subscription.stripe_customer_id.slice(-8)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              )}
 
               <Separator />
 
               <div className="space-y-3">
                 <h4 className="font-semibold">Recursos do Plano</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>✓ Análises estatísticas avançadas</li>
-                  <li>✓ Upload de datasets ilimitados</li>
-                  <li>✓ Suporte prioritário por e-mail</li>
-                  <li>✓ Colaboração em equipe</li>
+                  {userPlan.features.map((feature, index) => (
+                    <li key={index}>✓ {feature}</li>
+                  ))}
                 </ul>
               </div>
 

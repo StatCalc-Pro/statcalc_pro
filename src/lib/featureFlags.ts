@@ -6,8 +6,8 @@ export const FEATURE_FLAGS = {
   REQUIRE_AUTH: true, // true = obriga login, false = opcional
   
   // UI/UX
-  SHOW_UPGRADE_PROMPTS: false, // true = mostra modais de upgrade, false = esconde
-  SHOW_PLAN_BADGES: false, // true = mostra badges de plano, false = esconde
+  SHOW_UPGRADE_PROMPTS: true, // true = mostra modais de upgrade, false = esconde
+  SHOW_PLAN_BADGES: true, // true = mostra badges de plano, false = esconde
   
   // Admin
   ENABLE_DEV_PANEL: true, // sempre true para GOD MASTER
