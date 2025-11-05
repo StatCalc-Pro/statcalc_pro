@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Landing from "./pages/Landing";
 import Onboarding from "./pages/Onboarding";
+import Admin from "./pages/Admin";
 import Calculator from "./pages/Calculator";
 import Results from "./pages/Results";
 import Help from "./pages/Help";
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/dashboard" element={<Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />
           {isFeatureEnabled('ENABLE_ONBOARDING') && <Route path="/landing" element={<Landing />} />}
           {(isFeatureEnabled('ENABLE_ONBOARDING') || isFeatureEnabled('SHOW_ONBOARDING_FOR_NEW_USERS')) && <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />}
+          <Route path="/admin" element={<Layout><ProtectedRoute><Admin /></ProtectedRoute></Layout>} />
           <Route path="/calculator" element={<Layout><ProtectedRoute><Calculator /></ProtectedRoute></Layout>} />
           <Route path="/results" element={<Layout><ProtectedRoute><Results /></ProtectedRoute></Layout>} />
           <Route path="/help" element={<Layout><Help /></Layout>} />

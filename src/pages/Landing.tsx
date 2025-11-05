@@ -1,38 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, BarChart3, Shield, Zap, Users, Star, ArrowRight } from "lucide-react";
+import { BarChart3, Shield, Zap, Users, Star, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
-import { useStripeCheckout } from "@/hooks/useStripeCheckout";
-import { STRIPE_PRICES } from "@/lib/stripe";
 import { isFeatureEnabled } from "@/lib/featureFlags";
-import { toast } from "@/hooks/use-toast";
+import { LANDING_STATS, TESTIMONIALS } from "@/data/landingData";
 
 const Landing = () => {
   const { user } = useAuth();
-  const { createCheckoutSession, loading } = useStripeCheckout();
-
-  const handleSubscribe = async (priceId: string) => {
-    if (!user) {
-      toast({
-        title: "Login necessário",
-        description: "Faça login para assinar um plano",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await createCheckoutSession(priceId);
-    } catch (error) {
-      toast({
-        title: "Erro no checkout",
-        description: "Tente novamente em alguns instantes",
-        variant: "destructive"
-      });
-    }
-  };
 
   const features = [
     {
@@ -57,56 +33,9 @@ const Landing = () => {
     }
   ];
 
-  const testimonials = [
-    {
-      name: "Dra. Maria Silva",
-      role: "Cardiologista",
-      content: "Revolucionou minha pesquisa. Antes levava horas para calcular ROC, agora são segundos.",
-      rating: 5
-    },
-    {
-      name: "Dr. João Santos",
-      role: "Epidemiologista",
-      content: "Interface intuitiva e resultados precisos. Essencial para qualquer pesquisador.",
-      rating: 5
-    }
-  ];
 
-  const plans = [
-    {
-      name: "Teste Gratuito",
-      description: "Para testar a plataforma.",
-      price: "R$0",
-      period: "/ mês",
-      priceId: STRIPE_PRICES.TEST_FREE,
-      features: [
-        "Fórmulas estatísticas básicas",
-        "Até 10 uploads de dados",
-        "Visualização padrão de dados",
-        "Suporte por email"
-      ],
-      buttonText: "Testar Grátis",
-      buttonVariant: "outline" as const,
-      popular: false
-    },
-    {
-      name: "Premium",
-      description: "Para pesquisadores ativos e pequenas equipes.",
-      price: "R$59",
-      period: "/ mês",
-      priceId: STRIPE_PRICES.PRO_MONTHLY,
-      features: [
-        "Fórmulas estatísticas avançadas",
-        "Uploads ilimitados de dados",
-        "Visualização avançada de dados",
-        "Recursos de colaboração em equipe",
-        "Suporte prioritário por email"
-      ],
-      buttonText: "Começar Agora",
-      buttonVariant: "default" as const,
-      popular: true
-    }
-  ];
+
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,9 +52,6 @@ const Landing = () => {
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Recursos
-            </a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-              Preços
             </a>
             <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
               Sobre
@@ -154,8 +80,13 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="container mx-auto max-w-6xl text-center">
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-yellow-800 font-medium">
+              ⚠️ Projeto em pausa temporária - Voltaremos em alguns meses com novidades!
+            </p>
+          </div>
           <Badge className="mb-4" variant="secondary">
-            Usado por mais de 1.000 pesquisadores
+            +{LANDING_STATS.siteVisits} visitas • +{LANDING_STATS.interactions} interações • +{LANDING_STATS.activeUsers} usuários ativos
           </Badge>
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             Análise Estatística
@@ -166,12 +97,9 @@ const Landing = () => {
             com a precisão que sua pesquisa merece.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/auth">
-              <Button size="lg" className="text-lg px-8">
-                Começar Gratuitamente
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button size="lg" className="text-lg px-8" disabled>
+              Em Desenvolvimento
+            </Button>
             <Button 
               size="lg" 
               variant="outline" 
@@ -303,22 +231,10 @@ const Landing = () => {
               obter resultados precisos para suas pesquisas.
             </p>
             <Link to="/auth">
-              <Button size="lg" className="mr-4">
+              <Button size="lg">
                 Testar Gratuitamente
               </Button>
             </Link>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => {
-                // Scroll to pricing section
-                document.getElementById('pricing')?.scrollIntoView({ 
-                  behavior: 'smooth' 
-                });
-              }}
-            >
-              Ver Preços
-            </Button>
           </div>
         </div>
       </section>}
@@ -330,8 +246,8 @@ const Landing = () => {
             <h2 className="text-4xl font-bold mb-4">O que dizem nossos usuários</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial, i) => (
+          <div className="grid md:grid-cols-1 gap-8 max-w-2xl mx-auto">
+            {TESTIMONIALS.map((testimonial, i) => (
               <Card key={i}>
                 <CardContent className="pt-6">
                   <div className="flex mb-4">
@@ -351,66 +267,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Escolha Seu Plano</h2>
-            <p className="text-xl text-muted-foreground">
-              Preços transparentes para pesquisadores de todos os níveis
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {plans.map((plan) => (
-              <Card 
-                key={plan.name} 
-                className={`relative ${plan.popular ? 'border-primary border-2 shadow-lg' : ''}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground">Mais Popular</Badge>
-                  </div>
-                )}
-                
-                <CardHeader>
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                  <div className="mt-4">
-                    <span className="text-5xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-6">
-                  <Button 
-                    className="w-full" 
-                    variant={plan.buttonVariant}
-                    size="lg"
-                    onClick={() => {
-                      if (plan.priceId) {
-                        handleSubscribe(plan.priceId);
-                      }
-                    }}
-                    disabled={loading}
-                  >
-                    {loading ? "Processando..." : plan.buttonText}
-                  </Button>
-
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* About Section */}
       <section id="about" className="py-20 px-4 bg-muted/30">
@@ -439,20 +296,20 @@ const Landing = () => {
             <div className="space-y-6">
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-3xl font-bold text-primary mb-2">1000+</div>
-                  <p className="text-muted-foreground">Pesquisadores ativos</p>
+                  <div className="text-3xl font-bold text-primary mb-2">{LANDING_STATS.siteVisits}+</div>
+                  <p className="text-muted-foreground">Visitas ao site</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-3xl font-bold text-primary mb-2">50k+</div>
-                  <p className="text-muted-foreground">Análises realizadas</p>
+                  <div className="text-3xl font-bold text-primary mb-2">{LANDING_STATS.interactions}+</div>
+                  <p className="text-muted-foreground">Interações</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-3xl font-bold text-primary mb-2">99.9%</div>
-                  <p className="text-muted-foreground">Precisão validada</p>
+                  <div className="text-3xl font-bold text-primary mb-2">{LANDING_STATS.postViews.toLocaleString()}+</div>
+                  <p className="text-muted-foreground">Visualizações em posts</p>
                 </CardContent>
               </Card>
             </div>
@@ -496,7 +353,6 @@ const Landing = () => {
               <h4 className="font-semibold mb-4">Produto</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><a href="#features" className="hover:text-foreground">Recursos</a></li>
-                <li><a href="#pricing" className="hover:text-foreground">Preços</a></li>
                 <li><Link to="/help" className="hover:text-foreground">Ajuda</Link></li>
               </ul>
             </div>

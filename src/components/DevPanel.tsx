@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Crown, RefreshCw, Database } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Settings, Crown, RefreshCw, Database, Shield } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { PlanType, PLAN_FEATURES } from "@/lib/subscription";
 import { useAuth } from "@/lib/auth";
@@ -89,7 +90,7 @@ export const DevPanel = () => {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-80">
+    <div className="fixed bottom-4 right-4 z-50 w-72">
       <Card className="shadow-lg">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -103,89 +104,147 @@ export const DevPanel = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Crown className="h-4 w-4" />
-              <span className="text-sm font-medium">Plano Atual:</span>
-              <Badge variant={userPlan.type === 'free' ? 'secondary' : 'default'}>
-                {userPlan.type}
-              </Badge>
+        <CardContent className="space-y-3">
+          {/* Status GOD MASTER */}
+          <div className="text-center p-3 bg-red-50 border border-red-200 rounded">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Crown className="h-4 w-4 text-red-600" />
+              <Badge variant="destructive">GOD MASTER</Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Análises: {userPlan.analysesUsed}/{userPlan.analysesLimit === -1 ? '∞' : userPlan.analysesLimit}
+            <p className="text-xs text-red-600 font-medium">
+              Acesso Total • Poderes Ilimitados
             </p>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-medium">Trocar Plano:</p>
-            <div className="flex gap-2">
+          {/* Simulação de Planos */}
+          <div>
+            <p className="text-xs font-medium mb-2">🎭 Simular Planos:</p>
+            <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={() => changePlan('free')}
                 size="sm"
-                variant={userPlan.type === 'free' ? 'default' : 'outline'}
+                variant="outline"
+                className="text-xs"
               >
-                Free
+                👤 Free
               </Button>
               <Button
                 onClick={() => changePlan('pro')}
                 size="sm"
-                variant={userPlan.type === 'pro' ? 'default' : 'outline'}
+                variant="outline"
+                className="text-xs"
               >
-                Pro
-              </Button>
-              <Button
-                onClick={() => changePlan('enterprise')}
-                size="sm"
-                variant={userPlan.type === 'enterprise' ? 'default' : 'outline'}
-              >
-                Enterprise
-              </Button>
-              <Button
-                onClick={() => changePlan('god_master')}
-                size="sm"
-                variant={userPlan.type === 'god_master' ? 'destructive' : 'outline'}
-              >
-                GOD MASTER
+                💎 Premium
               </Button>
             </div>
           </div>
 
-          <Button
-            onClick={async () => {
-              if (user) {
-                await initializeUserData(user.id);
-                window.location.reload();
-              }
-            }}
-            size="sm"
-            variant="outline"
-            className="w-full"
-          >
-            <Database className="h-3 w-3 mr-1" />
-            Inicializar Dados
-          </Button>
-
+          {/* Ferramentas de Debug */}
           <div>
-            <p className="text-xs font-medium mb-2">Features Ativas:</p>
-            <div className="flex flex-wrap gap-1">
-              {userPlan.features.map((feature) => (
-                <Badge key={feature} variant="outline" className="text-xs">
-                  {feature}
-                </Badge>
-              ))}
+            <p className="text-xs font-medium mb-2">🔧 Debug Tools:</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={resetUsage}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                🔄 Reset
+              </Button>
+              <Button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+                size="sm"
+                variant="outline"
+                className="text-xs"
+              >
+                🗑️ Clear
+              </Button>
             </div>
           </div>
 
-          <Button
-            onClick={resetUsage}
-            size="sm"
-            variant="outline"
-            className="w-full"
-          >
-            <RefreshCw className="h-3 w-3 mr-1" />
-            Reset Uso
-          </Button>
+          {/* Feature Flags */}
+          <div>
+            <p className="text-xs font-medium mb-2">🚩 Feature Flags:</p>
+            <div className="space-y-1">
+              <Button
+                onClick={() => {
+                  const flags = JSON.parse(localStorage.getItem('featureFlags') || '{}');
+                  flags.ENABLE_ONBOARDING = !flags.ENABLE_ONBOARDING;
+                  localStorage.setItem('featureFlags', JSON.stringify(flags));
+                  window.location.reload();
+                }}
+                size="sm"
+                variant={JSON.parse(localStorage.getItem('featureFlags') || '{}').ENABLE_ONBOARDING ? 'default' : 'outline'}
+                className="w-full text-xs"
+              >
+                {JSON.parse(localStorage.getItem('featureFlags') || '{}').ENABLE_ONBOARDING ? '✅' : '❌'} Onboarding
+              </Button>
+              <Button
+                onClick={() => {
+                  const flags = JSON.parse(localStorage.getItem('featureFlags') || '{}');
+                  flags.SHOW_PRICING_PAGE = !flags.SHOW_PRICING_PAGE;
+                  localStorage.setItem('featureFlags', JSON.stringify(flags));
+                  window.location.reload();
+                }}
+                size="sm"
+                variant={JSON.parse(localStorage.getItem('featureFlags') || '{}').SHOW_PRICING_PAGE ? 'default' : 'outline'}
+                className="w-full text-xs"
+              >
+                {JSON.parse(localStorage.getItem('featureFlags') || '{}').SHOW_PRICING_PAGE ? '✅' : '❌'} Pricing
+              </Button>
+            </div>
+          </div>
+
+          {/* Ações de Admin */}
+          <div>
+            <p className="text-xs font-medium mb-2">👑 Admin Actions:</p>
+            <div className="space-y-2">
+              <Link to="/admin">
+                <Button size="sm" variant="destructive" className="w-full">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Painel Admin
+                </Button>
+              </Link>
+              <Button
+                onClick={async () => {
+                  try {
+                    const { data } = await supabase.from('subscriptions').select('count');
+                    const { data: usage } = await supabase.from('usage_tracking').select('analyses_count');
+                    const totalAnalyses = usage?.reduce((sum, u) => sum + u.analyses_count, 0) || 0;
+                    alert(`📊 Stats:\n• Usuários: ${data?.length || 0}\n• Análises: ${totalAnalyses}`);
+                  } catch (error) {
+                    alert('Erro ao buscar stats');
+                  }
+                }}
+                size="sm"
+                variant="outline"
+                className="w-full text-xs"
+              >
+                📊 Quick Stats
+              </Button>
+              <Button
+                onClick={() => {
+                  const info = {
+                    userAgent: navigator.userAgent,
+                    url: window.location.href,
+                    timestamp: new Date().toISOString(),
+                    localStorage: Object.keys(localStorage),
+                    sessionStorage: Object.keys(sessionStorage)
+                  };
+                  console.log('🔍 Debug Info:', info);
+                  alert('Debug info logged to console');
+                }}
+                size="sm"
+                variant="outline"
+                className="w-full text-xs"
+              >
+                🔍 Debug Info
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
