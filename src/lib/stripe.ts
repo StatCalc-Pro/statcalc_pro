@@ -5,6 +5,7 @@ export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_
 
 // Price IDs dos planos (substituir pelos IDs reais do Stripe)
 export const STRIPE_PRICES = {
-  TEST_FREE: 'price_1SP7q2PMcRymeCXlNQqEEp5g', // R$ 0/mês - Plano de teste
-  PRO_MONTHLY: 'price_1SP7L7PMcRymeCXlkrhzGot3', // R$ 59/mês - Substituir pelo price ID real
+  STUDENT_MONTHLY: 'price_1SY9NrPMcRymeCXl2lPCIXBX', // R$ 9/mês - Criar no Stripe
+  PRO_MONTHLY: 'price_1SY9O3PMcRymeCXlLRXNv2aB', // R$ 19/mês - Criar no Stripe  
+  ENTERPRISE_MONTHLY: 'price_1SY9P0PMcRymeCXlJcCUtVkM', // R$ 99/mês - Criar no Stripe
 } as const;

@@ -58,7 +58,7 @@ const Pricing = () => {
       description: "Desconto educacional com .edu",
       price: "R$9",
       period: "/ mês",
-      priceId: "price_student",
+      priceId: STRIPE_PRICES.STUDENT_MONTHLY,
       features: [
         "Todas as features Pro",
         "Materiais didáticos extras",

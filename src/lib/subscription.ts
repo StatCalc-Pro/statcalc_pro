@@ -15,16 +15,16 @@ export const PLAN_FEATURES = {
     features: ['basic_auc'] // Apenas AUC básico
   },
   student: {
-    analysesLimit: -1, // Ilimitado
+    analysesLimit: 50, // 50 por mês
     price: 9,
-    curvesPerAnalysis: -1,
-    features: ['basic_export', 'advanced_export', 'detailed_metrics', 'roc_chart', 'detailed_data', 'advanced_metrics', 'curve_comparison', 'optimal_cutoff', 'clinical_interpretation', 'specialty_templates']
+    curvesPerAnalysis: 3, // Máximo 3 curvas por análise
+    features: ['basic_export', 'detailed_metrics', 'roc_chart', 'detailed_data', 'advanced_metrics', 'educational_content']
   },
   pro: {
     analysesLimit: -1, // Ilimitado
     price: 19,
-    curvesPerAnalysis: -1,
-    features: ['basic_export', 'advanced_export', 'detailed_metrics', 'roc_chart', 'detailed_data', 'advanced_metrics', 'curve_comparison', 'optimal_cutoff', 'clinical_interpretation', 'specialty_templates', 'priority_support']
+    curvesPerAnalysis: -1, // Ilimitado
+    features: ['basic_export', 'advanced_export', 'detailed_metrics', 'roc_chart', 'detailed_data', 'advanced_metrics', 'curve_comparison', 'optimal_cutoff', 'clinical_interpretation', 'specialty_templates', 'priority_support', 'batch_processing', 'api_integration']
   },
   enterprise: {
     analysesLimit: -1,

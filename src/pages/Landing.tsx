@@ -305,13 +305,45 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <Card className="relative">
               <CardHeader>
-                <CardTitle className="text-2xl">Teste Gratuito</CardTitle>
-                <CardDescription>Para testar a plataforma.</CardDescription>
+                <CardTitle className="text-2xl">Gratuito</CardTitle>
+                <CardDescription>Para sempre. Sem pegadinhas.</CardDescription>
                 <div className="mt-4">
                   <span className="text-5xl font-bold">R$0</span>
+                  <span className="text-muted-foreground">/ sempre</span>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Link to="/auth">
+                  <Button className="w-full" variant="outline" size="lg">
+                    Começar Grátis
+                  </Button>
+                </Link>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">1 análise por dia</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">AUC básico</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Exportação PNG/CSV</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle className="text-2xl">Estudante</CardTitle>
+                <CardDescription>Desconto educacional com .edu</CardDescription>
+                <div className="mt-4">
+                  <span className="text-5xl font-bold">R$9</span>
                   <span className="text-muted-foreground">/ mês</span>
                 </div>
               </CardHeader>
@@ -320,27 +352,27 @@ const Landing = () => {
                   className="w-full" 
                   variant="outline"
                   size="lg"
-                  onClick={() => handleSubscribe(STRIPE_PRICES.TEST_FREE)}
+                  onClick={() => handleSubscribe(STRIPE_PRICES.STUDENT_MONTHLY)}
                   disabled={loading}
                 >
-                  {loading ? "Processando..." : "Testar Grátis"}
+                  {loading ? "Processando..." : "Plano Estudante"}
                 </Button>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Fórmulas estatísticas básicas</span>
+                    <span className="text-sm">50 análises/mês</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Até 10 uploads de dados</span>
+                    <span className="text-sm">Até 3 curvas por análise</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Visualização padrão de dados</span>
+                    <span className="text-sm">Métricas avançadas</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Suporte por email</span>
+                    <span className="text-sm">Conteúdo educacional</span>
                   </li>
                 </ul>
               </CardContent>
@@ -351,8 +383,8 @@ const Landing = () => {
                 <Badge className="bg-primary text-primary-foreground">Mais Popular</Badge>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">Premium</CardTitle>
-                <CardDescription>Para pesquisadores ativos e pequenas equipes.</CardDescription>
+                <CardTitle className="text-2xl">Pro</CardTitle>
+                <CardDescription>Para pesquisadores e profissionais.</CardDescription>
                 <div className="mt-4">
                   <span className="text-5xl font-bold">R$19</span>
                   <span className="text-muted-foreground">/ mês</span>
@@ -365,28 +397,28 @@ const Landing = () => {
                   onClick={() => handleSubscribe(STRIPE_PRICES.PRO_MONTHLY)}
                   disabled={loading}
                 >
-                  {loading ? "Processando..." : "Começar Agora"}
+                  {loading ? "Processando..." : "Upgrade para Pro"}
                 </Button>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Fórmulas estatísticas avançadas</span>
+                    <span className="text-sm">Análises ilimitadas</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Uploads ilimitados de dados</span>
+                    <span className="text-sm">Curvas ilimitadas</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Visualização avançada de dados</span>
+                    <span className="text-sm">Comparação de curvas</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Recursos de colaboração em equipe</span>
+                    <span className="text-sm">Templates por especialidade</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">Suporte prioritário por email</span>
+                    <span className="text-sm">Processamento em lote</span>
                   </li>
                 </ul>
               </CardContent>
