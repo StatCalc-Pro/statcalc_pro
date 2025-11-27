@@ -145,7 +145,7 @@ const Account = () => {
 
     setCancelLoading(true);
     try {
-      const { error } = await supabase.functions.invoke('stripe-webhooks', {
+      const { error } = await supabase.functions.invoke('stripe-webhook', {
         body: { 
           type: 'customer.subscription.deleted',
           data: { object: { id: subscription?.stripe_subscription_id } }

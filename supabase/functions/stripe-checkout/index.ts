@@ -69,8 +69,8 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${Deno.env.get('APP_URL')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${Deno.env.get('APP_URL')}/pricing`,
+      success_url: `${req.headers.get('origin') || 'https://statcalcpro.vercel.app'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get('origin') || 'https://statcalcpro.vercel.app'}/pricing`,
       metadata: {
         userId: user.id,
       },

@@ -70,10 +70,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const priceId = subscription.items.data[0]?.price.id;
 
   // Determinar tipo do plano baseado no price ID
-  let planType = 'pro';
-  if (priceId === Deno.env.get('STRIPE_ENTERPRISE_PRICE_ID')) {
-    planType = 'enterprise';
-  }
+  let planType = 'pro'; // default
+  
+  // Mapear Price IDs para tipos de plano
+  const priceToTypeMap = {
+    'price_1SY9NrPMcRymeCXl2lPCIXBX': 'student',  // R$ 9/mês
+    'price_1SY9O3PMcRymeCXlLRXNv2aB': 'pro',      // R$ 19/mês
+    'price_1SY9P0PMcRymeCXlJcCUtVkM': 'enterprise' // R$ 99/mês
+  };
+  
+  planType = priceToTypeMap[priceId] || 'pro';
 
   // Atualizar subscription no banco
   const { error } = await supabase

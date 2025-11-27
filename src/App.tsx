@@ -21,7 +21,7 @@ import Account from "./pages/Account";
 import Auth from "./pages/Auth";
 
 import ForgotPassword from "./pages/ForgotPassword";
-import Success from "./pages/Sucess";
+import Success from "./pages/Success";
 import { trackPageview } from "@/lib/vercel-analytics";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { isFeatureEnabled } from "@/lib/featureFlags";
