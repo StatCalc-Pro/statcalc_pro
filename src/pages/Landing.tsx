@@ -1,14 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Shield, Zap, Users, Star, ArrowRight } from "lucide-react";
+import { Check, BarChart3, Shield, Zap, Users, Star, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { STRIPE_PRICES } from "@/lib/stripe";
 import { isFeatureEnabled } from "@/lib/featureFlags";
+import { toast } from "@/hooks/use-toast";
 import { LANDING_STATS, TESTIMONIALS } from "@/data/landingData";
 
 const Landing = () => {
   const { user } = useAuth();
+  const { createCheckoutSession, loading } = useStripeCheckout();
+
+  const handleSubscribe = async (priceId: string) => {
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Faça login para assinar um plano",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await createCheckoutSession(priceId);
+    } catch (error) {
+      toast({
+        title: "Erro no checkout",
+        description: "Tente novamente em alguns instantes",
+        variant: "destructive"
+      });
+    }
+  };
 
   const features = [
     {
@@ -52,6 +77,9 @@ const Landing = () => {
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Recursos
+            </a>
+            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+              Preços
             </a>
             <a href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
               Sobre
@@ -267,7 +295,105 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      {isFeatureEnabled('SHOW_PRICING_PAGE') && <section id="pricing" className="py-20 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Escolha Seu Plano</h2>
+            <p className="text-xl text-muted-foreground">
+              Preços transparentes para pesquisadores de todos os níveis
+            </p>
+          </div>
 
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="relative">
+              <CardHeader>
+                <CardTitle className="text-2xl">Teste Gratuito</CardTitle>
+                <CardDescription>Para testar a plataforma.</CardDescription>
+                <div className="mt-4">
+                  <span className="text-5xl font-bold">R$0</span>
+                  <span className="text-muted-foreground">/ mês</span>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Button 
+                  className="w-full" 
+                  variant="outline"
+                  size="lg"
+                  onClick={() => handleSubscribe(STRIPE_PRICES.TEST_FREE)}
+                  disabled={loading}
+                >
+                  {loading ? "Processando..." : "Testar Grátis"}
+                </Button>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Fórmulas estatísticas básicas</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Até 10 uploads de dados</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Visualização padrão de dados</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Suporte por email</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="relative border-primary border-2 shadow-lg">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <Badge className="bg-primary text-primary-foreground">Mais Popular</Badge>
+              </div>
+              <CardHeader>
+                <CardTitle className="text-2xl">Premium</CardTitle>
+                <CardDescription>Para pesquisadores ativos e pequenas equipes.</CardDescription>
+                <div className="mt-4">
+                  <span className="text-5xl font-bold">R$19</span>
+                  <span className="text-muted-foreground">/ mês</span>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => handleSubscribe(STRIPE_PRICES.PRO_MONTHLY)}
+                  disabled={loading}
+                >
+                  {loading ? "Processando..." : "Começar Agora"}
+                </Button>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Fórmulas estatísticas avançadas</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Uploads ilimitados de dados</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Visualização avançada de dados</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Recursos de colaboração em equipe</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Suporte prioritário por email</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>}
 
       {/* About Section */}
       <section id="about" className="py-20 px-4 bg-muted/30">
@@ -353,6 +479,7 @@ const Landing = () => {
               <h4 className="font-semibold mb-4">Produto</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li><a href="#features" className="hover:text-foreground">Recursos</a></li>
+                <li><a href="#pricing" className="hover:text-foreground">Preços</a></li>
                 <li><Link to="/help" className="hover:text-foreground">Ajuda</Link></li>
               </ul>
             </div>

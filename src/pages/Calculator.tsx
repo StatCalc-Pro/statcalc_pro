@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { computeMetrics, exportResultsJson } from "@/lib/metrics";
+import { calculateAdvancedROC, bootstrapConfidenceInterval } from "@/lib/advancedMetrics";
+import { RobustParser } from "@/lib/robustParser";
 import { Input } from "@/components/ui/input";
 import { generateMockData } from "@/lib/mockGenerator";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -43,8 +45,45 @@ const Calculator = () => {
       const sheet = workbook.Sheets[sheetName];
       const raw = XLSX.utils.sheet_to_json(sheet, { defval: null });
 
-      const rows = computeMetrics(raw as any[]);
+      // Usar parser robusto
+      const parsedData = RobustParser.parseExcelData(raw as any[]);
+      
+      // Mostrar erros/sugestões se houver
+      const allErrors = parsedData.flatMap(d => d.errors || []);
+      const allSuggestions = parsedData.flatMap(d => d.suggestions || []);
+      
+      if (allErrors.length > 0) {
+        toast.error(`Erros encontrados: ${allErrors.slice(0, 3).join(', ')}${allErrors.length > 3 ? '...' : ''}`);
+      }
+      if (allSuggestions.length > 0) {
+        toast.warning(`Sugestões: ${allSuggestions.slice(0, 2).join(', ')}${allSuggestions.length > 2 ? '...' : ''}`);
+      }
+
+      const rows = computeMetrics(parsedData as any[]);
+      
+      // Calcular métricas avançadas
+      const tpr = rows.map(r => r.tpr);
+      const fpr = rows.map(r => r.fpr);
+      const totalPositives = rows.reduce((sum, r) => sum + r.tp + r.fn, 0);
+      const totalNegatives = rows.reduce((sum, r) => sum + r.tn + r.fp, 0);
+      
+      let advancedResults = null;
+      if (totalPositives > 0 && totalNegatives > 0) {
+        try {
+          advancedResults = calculateAdvancedROC(tpr, fpr, totalPositives, totalNegatives);
+          toast.success(`AUC: ${advancedResults.auc.toFixed(3)} (IC 95%: ${advancedResults.ci_lower.toFixed(3)}-${advancedResults.ci_upper.toFixed(3)})`);
+        } catch (error) {
+          console.error('Erro no cálculo avançado:', error);
+        }
+      }
+      
       const json = exportResultsJson(rows);
+      
+      // Adicionar métricas avançadas ao resultado
+      if (advancedResults) {
+        json.summary.advanced = advancedResults;
+        console.log('Métricas avançadas adicionadas:', advancedResults);
+      }
 
       // set pending result and let user edit name before saving
       setPendingResult(json);
@@ -62,7 +101,7 @@ const Calculator = () => {
 
   const handleProcess = () => {
     // Verificar se pode criar análise (apenas se limitações estiverem ativas)
-    if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS') && !canCreateAnalysis()) {
+    if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS') && !canCreateAnalysis(userPlan)) {
       setShowUpgradeModal(true);
       return;
     }
@@ -98,6 +137,12 @@ const Calculator = () => {
       console.error("Falha ao atualizar histórico de análises", e);
     }
 
+    // Marcar uso diário para plano gratuito
+    if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS') && userPlan.type === 'free') {
+      const today = new Date().toDateString();
+      localStorage.setItem('lastAnalysisDate', today);
+    }
+    
     // Incrementar uso (apenas se limitações estiverem ativas)
     if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS')) {
       incrementUsage();

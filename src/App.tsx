@@ -12,7 +12,9 @@ import Admin from "./pages/Admin";
 import Calculator from "./pages/Calculator";
 import Results from "./pages/Results";
 import Help from "./pages/Help";
+import Guide from "./pages/Guide";
 import About from "./pages/About";
+import Validation from "./pages/Validation";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import Account from "./pages/Account";
@@ -50,7 +52,9 @@ const App = () => {
           <Route path="/calculator" element={<Layout><ProtectedRoute><Calculator /></ProtectedRoute></Layout>} />
           <Route path="/results" element={<Layout><ProtectedRoute><Results /></ProtectedRoute></Layout>} />
           <Route path="/help" element={<Layout><Help /></Layout>} />
+          <Route path="/guide/:guideId" element={<Layout><Guide /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
+          <Route path="/validation" element={<Layout><Validation /></Layout>} />
           <Route path="/account" element={<Layout><ProtectedRoute><Account /></ProtectedRoute></Layout>} />
           {isFeatureEnabled('SHOW_PRICING_PAGE') && <Route path="/pricing" element={<Pricing />} />}
           <Route path="/auth" element={<Auth />} />

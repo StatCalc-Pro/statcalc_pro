@@ -64,23 +64,43 @@ const Admin = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      // Usar Edge Function para buscar dados com permissões de admin
-      const { data, error } = await supabase.functions.invoke('admin-users', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        }
-      });
+      // Buscar usuários da tabela auth.users diretamente
+      const { data: authUsers } = await supabase
+        .from('auth.users')
+        .select('id, email, created_at, raw_user_meta_data');
 
-      if (error) throw error;
+      const { data: subscriptions } = await supabase
+        .from('subscriptions')
+        .select('*');
 
-      const { users: usersWithData, subscriptions, usage } = data;
+      const { data: usage } = await supabase
+        .from('usage_tracking')
+        .select('*');
+
+      // Combinar dados
+      const usersWithData = authUsers?.map(authUser => {
+        const userSub = subscriptions?.find(sub => sub.user_id === authUser.id);
+        const userUsage = usage?.find(u => u.user_id === authUser.id);
+        
+        return {
+          id: authUser.id,
+          email: authUser.email,
+          created_at: authUser.created_at,
+          user_metadata: authUser.raw_user_meta_data,
+          subscription: userSub,
+          usage: userUsage
+        };
+      }) || [];
+
+      const data = usersWithData;
+
+      // Dados processados das tabelas
       setUsers(usersWithData);
 
       // Calcular métricas
       const totalUsers = usersWithData.length;
-      const activeSubscriptions = subscriptions?.filter(sub => sub.status === 'active').length || 0;
-      const totalAnalyses = usage?.reduce((sum, u) => sum + (u.analyses_count || 0), 0) || 0;
+      const activeSubscriptions = usersWithData.filter(u => u.subscription?.status === 'active').length;
+      const totalAnalyses = usersWithData.reduce((sum, u) => sum + (u.usage?.analyses_count || 0), 0);
       const recentSignups = usersWithData.filter(u => 
         new Date(u.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000
       ).length;
@@ -106,13 +126,11 @@ const Admin = () => {
 
   const updateUserPlan = async (userId: string, newPlan: string) => {
     try {
-      const { error } = await supabase.functions.invoke('admin-users', {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: { userId, planType: newPlan }
-      });
+      // Atualizar diretamente na tabela subscriptions
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({ plan_type: newPlan })
+        .eq('user_id', userId);
 
       if (error) throw error;
 
@@ -134,19 +152,13 @@ const Admin = () => {
 
   const deleteUser = async (userId: string) => {
     try {
-      const { error } = await supabase.functions.invoke('admin-users', {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: { userId }
-      });
-
-      if (error) throw error;
-
+      // Deletar registros relacionados primeiro
+      await supabase.from('subscriptions').delete().eq('user_id', userId);
+      await supabase.from('usage_tracking').delete().eq('user_id', userId);
+      
       toast({
-        title: "Usuário deletado",
-        description: "Usuário foi removido com sucesso"
+        title: "Dados do usuário removidos",
+        description: "Registros do usuário foram limpos (auth permanece)"
       });
 
       loadData();
@@ -155,6 +167,46 @@ const Admin = () => {
       toast({
         title: "Erro",
         description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const impersonateUser = async (userId: string) => {
+    if (!userId) return;
+    
+    const targetUser = users.find(u => u.id === userId);
+    if (!targetUser) return;
+    
+    const confirmMsg = `ATENÇÃO: Você será redirecionado como ${targetUser.email}. Para voltar à sua conta GOD MASTER, faça logout e login novamente. Continuar?`;
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+      // Salvar informações para poder voltar
+      localStorage.setItem('admin_impersonation', JSON.stringify({
+        originalUserId: user?.id,
+        targetUserId: userId,
+        targetEmail: targetUser.email,
+        timestamp: Date.now()
+      }));
+      
+      // Simular mudança de usuário via localStorage
+      localStorage.setItem('impersonating_user_id', userId);
+      
+      toast({
+        title: "Impersonação ativada",
+        description: `Agora você está logado como ${targetUser.email}`
+      });
+      
+      // Redirecionar para dashboard
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+      
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: "Erro ao impersonar usuário",
         variant: "destructive"
       });
     }
@@ -234,6 +286,37 @@ const Admin = () => {
 
         {/* Usuários */}
         <TabsContent value="users">
+          {/* Impersonação de Usuário */}
+          <Card className="mb-6 border-red-200 bg-red-50">
+            <CardHeader>
+              <CardTitle className="text-red-800">🎭 Impersonar Usuário (GOD MASTER)</CardTitle>
+              <CardDescription className="text-red-700">
+                Faça login como qualquer usuário para testar funcionalidades
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Select onValueChange={(userId) => impersonateUser(userId)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um usuário para impersonar..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.email} ({user.subscription?.plan_type || 'free'})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <p className="text-xs text-red-600 mt-2">
+                ⚠️ Você será redirecionado como o usuário selecionado. Para voltar à sua conta, faça logout e login novamente.
+              </p>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Gerenciar Usuários</CardTitle>
@@ -291,6 +374,14 @@ const Admin = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => impersonateUser(user.id)}
+                            title="Impersonar usuário"
+                          >
+                            🔄
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"

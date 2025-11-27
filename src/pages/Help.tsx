@@ -14,42 +14,50 @@ const Help = () => {
   const guides = [
     {
       icon: FileUp,
-      title: "Carregando Dados",
-      description: "Aprenda sobre formatos de arquivo suportados e como estruturar seus dados para análise.",
-      link: "#"
+      title: "Formato dos Dados",
+      description: "Seu arquivo Excel deve conter as colunas: id, tp (verdadeiros positivos), fp (falsos positivos), tn (verdadeiros negativos), fn (falsos negativos).",
+      link: "/guide/formato-dados"
     },
     {
       icon: Calculator,
-      title: "Executando Cálculos",
-      description: "Instruções passo a passo sobre seleção e aplicação de fórmulas estatísticas.",
-      link: "#"
+      title: "Cálculos ROC/AUC",
+      description: "O sistema calcula automaticamente sensibilidade, especificidade, TPR, FPR e estima a AUC pelo método do trapézio.",
+      link: "/guide/calculos-roc"
     },
     {
       icon: BarChart3,
-      title: "Interpretando Resultados",
-      description: "Entenda as saídas, gráficos e métricas principais dos seus cálculos.",
-      link: "#"
+      title: "Curva ROC Interativa",
+      description: "Visualize a curva ROC com tooltip interativo mostrando os pontos de corte e métricas correspondentes.",
+      link: "/guide/curva-roc"
     },
     {
       icon: FileText,
-      title: "Exportando Relatórios",
-      description: "Como salvar, exportar e compartilhar suas descobertas em vários formatos.",
-      link: "#"
+      title: "Exportação",
+      description: "Exporte resultados em Excel (.xlsx), CSV ou salve o gráfico ROC como imagem PNG para suas publicações.",
+      link: "/guide/exportacao"
     }
   ];
 
   const faqs = [
     {
-      question: "Quais tipos de arquivo são suportados para upload de dados?",
-      answer: "O StatCalc Pro suporta uma variedade de formatos de arquivo incluindo Excel (.xlsx, .xls). Para melhores resultados, recomendamos usar um arquivo Excel bem estruturado com cabeçalhos na primeira linha contendo as colunas: id, tp, fp, tn, fn."
+      question: "Qual o formato exato que meu arquivo Excel deve ter?",
+      answer: "Seu arquivo deve conter exatamente estas colunas: 'id' (identificador do estudo), 'tp' (verdadeiros positivos), 'fp' (falsos positivos), 'tn' (verdadeiros negativos), 'fn' (falsos negativos). O sistema aceita variações nos nomes das colunas, mas usar estes nomes exatos evita problemas."
     },
     {
-      question: "Como meus dados de pacientes são protegidos?",
-      answer: "Levamos a segurança de dados a sério. Todos os dados são processados localmente no seu navegador, sem envio para servidores externos. Isso garante total privacidade e segurança dos seus dados sensíveis de pesquisa."
+      question: "Meus dados ficam seguros? São enviados para algum servidor?",
+      answer: "Não! Todos os cálculos são feitos localmente no seu navegador. Nenhum dado é enviado para servidores externos. Isso garante total privacidade dos seus dados de pesquisa, conforme exigências da LGPD."
     },
     {
-      question: "O que significa AUC nos meus resultados?",
-      answer: "AUC (Área Sob a Curva ROC) é uma medida estatística que avalia a capacidade de um teste diagnóstico distinguir entre casos positivos e negativos. Valores próximos a 1.0 indicam excelente desempenho, enquanto 0.5 indica desempenho equivalente ao acaso."
+      question: "Como interpretar os valores de AUC que o sistema calcula?",
+      answer: "AUC (Área Sob a Curva ROC) varia de 0 a 1: AUC = 0.5 indica desempenho equivalente ao acaso; AUC = 0.7-0.8 indica desempenho aceitável; AUC = 0.8-0.9 indica bom desempenho; AUC > 0.9 indica excelente desempenho diagnóstico."
+    },
+    {
+      question: "Posso usar o StatCalc Pro offline?",
+      answer: "Sim! Após carregar a página uma vez, o StatCalc Pro funciona offline. Todos os cálculos são feitos no seu navegador, sem necessidade de conexão com a internet."
+    },
+    {
+      question: "O que acontece com meu histórico de análises?",
+      answer: "Seu histórico é salvo localmente no seu navegador. Os dados permanecem apenas no seu dispositivo e podem ser removidos individualmente quando desejar."
     }
   ];
 
@@ -99,9 +107,11 @@ const Help = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <Button variant="link" className="p-0 h-auto">
-                      Ver Guia <ArrowRight className="ml-1 h-4 w-4" />
-                    </Button>
+                    <Link to={guide.link}>
+                      <Button variant="link" className="p-0 h-auto">
+                        Ver Guia <ArrowRight className="ml-1 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               ))}
@@ -132,12 +142,13 @@ const Help = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Novo no StatCalc Pro? Nosso guia de primeiros passos fornece uma visão geral
-                do propósito da aplicação e recursos principais para você começar rapidamente.
+                Novo no StatCalc Pro? Comece fazendo upload de um arquivo Excel com seus dados de estudo clínico e veja os cálculos estatísticos em segundos.
               </p>
-              <Button className="w-full">
-                Ler visão geral <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link to="/calculator">
+                <Button className="w-full">
+                  Começar Análise <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -147,27 +158,22 @@ const Help = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Se você não conseguir encontrar a resposta que procura, nossa equipe de suporte está aqui para ajudar.
+                Encontrou algum problema ou tem sugestões? Entre em contato conosco.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Suporte por Email</p>
-                    <p className="text-muted-foreground">suporte@statcalcpro.com</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Suporte por Telefone</p>
-                    <p className="text-muted-foreground">Seg-Sex, 9h - 17h BRT</p>
+                    <p className="font-medium">Contato</p>
+                    <p className="text-muted-foreground">lucas.hcb0405@gmail.com</p>
                   </div>
                 </div>
               </div>
-              <Button className="w-full" variant="default">
-                <Ticket className="mr-2 h-4 w-4" />
-                Abrir Chamado
+              <Button className="w-full" variant="default" asChild>
+                <a href="https://github.com/lucasxae" target="_blank" rel="noopener noreferrer">
+                  <Ticket className="mr-2 h-4 w-4" />
+                  Reportar Problema
+                </a>
               </Button>
             </CardContent>
           </Card>

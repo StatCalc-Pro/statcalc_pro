@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { isFeatureEnabled } from "@/lib/featureFlags";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const location = useLocation();
+  const { signIn, signUp, user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -20,6 +22,39 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
+
+  useEffect(() => {
+    // Processar token de confirmação de email da URL
+    const hashParams = new URLSearchParams(location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const type = hashParams.get('type');
+    
+    if (accessToken && type === 'signup') {
+      // Definir sessão com o token
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: hashParams.get('refresh_token') || ''
+      }).then(() => {
+        // Limpar URL
+        window.history.replaceState({}, document.title, '/auth');
+        // Redirecionar para onboarding ou dashboard
+        if (isFeatureEnabled('SHOW_ONBOARDING_FOR_NEW_USERS')) {
+          navigate('/onboarding');
+        } else {
+          navigate('/dashboard');
+        }
+      });
+    }
+  }, [location.hash, navigate]);
+
+  // Se usuário já está logado, redirecionar
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,12 +90,10 @@ const Auth = () => {
         return
       }
       
-      // Mostrar aviso sobre validação de email
-      alert('Conta criada com sucesso! Verifique seu email para confirmar a conta antes de fazer login.')
-      
-      // Se o usuário foi criado mas precisa confirmar email, não redirecionar ainda
+      // Mostrar tela de confirmação de email
       if (data.user && !data.user.email_confirmed_at) {
-        // Usuário precisa confirmar email primeiro
+        setPendingEmail(signupEmail)
+        setShowEmailConfirmation(true)
         return
       }
       
@@ -72,6 +105,43 @@ const Auth = () => {
       }
     })()
   };
+
+  if (showEmailConfirmation) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4">
+        <Link to="/" className="flex items-center gap-2 mb-8">
+          <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-xl">S</span>
+          </div>
+          <span className="text-2xl font-bold">StatCalc Pro</span>
+        </Link>
+
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Mail className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl">Confirme seu email</CardTitle>
+            <CardDescription>
+              Enviamos um link de confirmação para <strong>{pendingEmail}</strong>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Clique no link do email para ativar sua conta. Após a confirmação, você será redirecionado automaticamente.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEmailConfirmation(false)}
+              className="w-full"
+            >
+              Voltar ao login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4">

@@ -80,7 +80,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     .from('subscriptions')
     .upsert({
       user_id: userId,
-      type: planType,
+      plan_type: planType,
       status: 'active',
       stripe_customer_id: customerId,
       stripe_subscription_id: subscriptionId,

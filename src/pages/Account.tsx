@@ -11,15 +11,19 @@ import { User, CreditCard, Bell, Shield, Eye, EyeOff, Loader2 } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { STRIPE_PRICES } from "@/lib/stripe";
 import { supabase } from "@/lib/supabaseClient";
 
 const Account = () => {
   const { toast } = useToast();
   const { user, updateProfile } = useAuth();
   const { userPlan, subscription, loading: subscriptionLoading } = useSubscription();
+  const { createCheckoutSession, loading: checkoutLoading } = useStripeCheckout();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   // Personal Info State
   const [name, setName] = useState("");
@@ -122,6 +126,49 @@ const Account = () => {
     });
   };
 
+  const handleUpgrade = async () => {
+    try {
+      await createCheckoutSession(STRIPE_PRICES.PRO_MONTHLY);
+    } catch (error) {
+      toast({
+        title: "Erro no checkout",
+        description: "Tente novamente em alguns instantes",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!confirm("Tem certeza que deseja cancelar sua assinatura? Você terá acesso até o final do período atual.")) {
+      return;
+    }
+
+    setCancelLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('stripe-webhooks', {
+        body: { 
+          type: 'customer.subscription.deleted',
+          data: { object: { id: subscription?.stripe_subscription_id } }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Assinatura cancelada",
+        description: "Sua assinatura foi cancelada com sucesso."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao cancelar",
+        description: error.message || "Tente novamente em alguns instantes",
+        variant: "destructive"
+      });
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
@@ -132,27 +179,19 @@ const Account = () => {
       </div>
 
       <Tabs defaultValue="personal" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="personal" className="gap-2">
             <User className="w-4 h-4" />
-            <span className="hidden sm:inline">Pessoal</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Shield className="w-4 h-4" />
-            <span className="hidden sm:inline">Segurança</span>
+            Meu Perfil
           </TabsTrigger>
           <TabsTrigger value="subscription" className="gap-2">
             <CreditCard className="w-4 h-4" />
-            <span className="hidden sm:inline">Assinatura</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="w-4 h-4" />
-            <span className="hidden sm:inline">Notificações</span>
+            Minha Assinatura
           </TabsTrigger>
         </TabsList>
 
         {/* Personal Information */}
-        <TabsContent value="personal">
+        <TabsContent value="personal" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Informações Pessoais</CardTitle>
@@ -196,12 +235,7 @@ const Account = () => {
                   />
                 </div>
 
-                <Separator />
-
                 <div className="flex justify-end gap-3">
-                  <Button type="button" variant="outline">
-                    Cancelar
-                  </Button>
                   <Button type="submit" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Salvar Alterações
@@ -210,15 +244,12 @@ const Account = () => {
               </form>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        {/* Security */}
-        <TabsContent value="security">
           <Card>
             <CardHeader>
-              <CardTitle>Segurança</CardTitle>
+              <CardTitle>Alterar Senha</CardTitle>
               <CardDescription>
-                Gerencie sua senha e configurações de segurança.
+                Mantenha sua conta segura com uma senha forte.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -261,9 +292,6 @@ const Account = () => {
                       {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Use pelo menos 8 caracteres com letras, números e símbolos.
-                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -277,12 +305,7 @@ const Account = () => {
                   />
                 </div>
 
-                <Separator />
-
                 <div className="flex justify-end gap-3">
-                  <Button type="button" variant="outline">
-                    Cancelar
-                  </Button>
                   <Button type="submit" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Alterar Senha
@@ -292,6 +315,8 @@ const Account = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+
 
         {/* Subscription */}
         <TabsContent value="subscription">
@@ -327,9 +352,16 @@ const Account = () => {
                       {userPlan.type === 'free' ? 'Gratuito' : 'R$ 59,00 / mês'}
                     </p>
                   </div>
-                  <Button asChild variant="outline">
-                    <Link to="/pricing">Alterar Plano</Link>
-                  </Button>
+                  {userPlan.type === 'free' ? (
+                    <Button onClick={handleUpgrade} disabled={checkoutLoading}>
+                      {checkoutLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Fazer Upgrade
+                    </Button>
+                  ) : (
+                    <Button asChild variant="outline">
+                      <Link to="/pricing">Alterar Plano</Link>
+                    </Button>
+                  )}
                 </div>
               )}
 
@@ -389,81 +421,27 @@ const Account = () => {
 
               <Separator />
 
-              <div className="pt-2">
-                <Button variant="destructive" className="w-full">
-                  Cancelar Assinatura
-                </Button>
-                <p className="text-xs text-center text-muted-foreground mt-2">
-                  Você terá acesso até o final do período atual.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Notifications */}
-        <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notificações</CardTitle>
-              <CardDescription>
-                Configure suas preferências de notificação.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSaveNotifications} className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <Label htmlFor="email-notifications">
-                        Notificações por E-mail
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Receba atualizações e novidades por e-mail.
-                      </p>
-                    </div>
-                    <input
-                      type="checkbox"
-                      id="email-notifications"
-                      checked={emailNotifications}
-                      onChange={(e) => setEmailNotifications(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                  </div>
-
-                  <Separator />
-
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <Label htmlFor="update-notifications">
-                        Atualizações de Produto
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Notificações sobre novos recursos e melhorias.
-                      </p>
-                    </div>
-                    <input
-                      type="checkbox"
-                      id="update-notifications"
-                      checked={updateNotifications}
-                      onChange={(e) => setUpdateNotifications(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-end gap-3">
-                  <Button type="button" variant="outline">
-                    Cancelar
+              {userPlan.type !== 'free' && subscription?.status === 'active' && (
+                <div className="pt-2">
+                  <Button 
+                    variant="destructive" 
+                    className="w-full"
+                    onClick={handleCancelSubscription}
+                    disabled={cancelLoading}
+                  >
+                    {cancelLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Cancelar Assinatura
                   </Button>
-                  <Button type="submit">Salvar Preferências</Button>
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    Você terá acesso até o final do período atual.
+                  </p>
                 </div>
-              </form>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
+
+
       </Tabs>
     </div>
   );

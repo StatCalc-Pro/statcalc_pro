@@ -8,8 +8,8 @@ BEGIN
   ON CONFLICT (user_id) DO NOTHING;
   
   -- Criar usage tracking
-  INSERT INTO public.usage_tracking (user_id, analyses_count, exports_count, created_at, updated_at)
-  VALUES (NEW.id, 0, 0, NOW(), NOW())
+  INSERT INTO public.usage_tracking (user_id, analyses_count, exports_count, month_year, created_at, updated_at)
+  VALUES (NEW.id, 0, 0, TO_CHAR(NOW(), 'YYYY-MM'), NOW(), NOW())
   ON CONFLICT (user_id) DO NOTHING;
   
   RETURN NEW;
@@ -25,8 +25,8 @@ CREATE TRIGGER on_auth_user_created
 -- Garantir que as tabelas existem
 CREATE TABLE IF NOT EXISTS public.subscriptions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  type TEXT NOT NULL DEFAULT 'free',
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  plan_type TEXT NOT NULL DEFAULT 'free',
   status TEXT NOT NULL DEFAULT 'active',
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT UNIQUE,
@@ -39,9 +39,10 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
 
 CREATE TABLE IF NOT EXISTS public.usage_tracking (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
   analyses_count INTEGER DEFAULT 0,
   exports_count INTEGER DEFAULT 0,
+  month_year TEXT NOT NULL DEFAULT TO_CHAR(NOW(), 'YYYY-MM'),
   stripe_subscription_id TEXT,
   last_reset TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMPTZ DEFAULT NOW(),

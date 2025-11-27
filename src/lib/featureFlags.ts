@@ -1,7 +1,7 @@
 // Feature flags para controle de produção
 export const FEATURE_FLAGS = {
   // Monetização
-  ENABLE_SUBSCRIPTION_LIMITS: false, // true = limita uso, false = uso livre
+  ENABLE_SUBSCRIPTION_LIMITS: true, // true = limita uso, false = uso livre
   SHOW_PRICING_PAGE: true, // true = mostra preços, false = esconde
   REQUIRE_AUTH: true, // true = obriga login, false = opcional
   

@@ -36,37 +36,62 @@ const Pricing = () => {
 
   const plans = [
     {
-      name: "Teste Gratuito",
-      description: "Para testar a plataforma.",
+      name: "Gratuito",
+      description: "Para sempre. Sem pegadinhas.",
       price: "R$0",
-      period: "/ mês",
-      priceId: STRIPE_PRICES.TEST_FREE,
+      period: "/ sempre",
+      priceId: null,
       features: [
-        "Fórmulas estatísticas básicas",
-        "Até 10 uploads de dados",
-        "Visualização padrão de dados",
+        "Análises ilimitadas",
+        "1 curva ROC por análise",
+        "AUC básico (trapézio)",
+        "Exportação PNG/CSV",
+        "Tutoriais completos",
         "Suporte por email"
       ],
-      buttonText: "Testar Gratis",
+      buttonText: "Começar Grátis",
       buttonVariant: "outline" as const,
       popular: false
     },
     {
-      name: "Premium",
-      description: "Para pesquisadores ativos e pequenas equipes.",
-      price: "R$59",
+      name: "Estudante",
+      description: "Desconto educacional com .edu",
+      price: "R$9",
+      period: "/ mês",
+      priceId: "price_student",
+      features: [
+        "Todas as features Pro",
+        "Materiais didáticos extras",
+        "Casos clínicos reais",
+        "Exercícios práticos",
+        "Certificado de conclusão",
+        "Suporte educacional"
+      ],
+      buttonText: "Plano Estudante",
+      buttonVariant: "outline" as const,
+      popular: false,
+      badge: "70% OFF"
+    },
+    {
+      name: "Pro",
+      description: "Para pesquisadores e profissionais.",
+      price: "R$19",
       period: "/ mês",
       priceId: STRIPE_PRICES.PRO_MONTHLY,
       features: [
-        "Fórmulas estatísticas avançadas",
-        "Uploads ilimitados de dados",
-        "Visualização avançada de dados",
-        "Recursos de colaboração em equipe",
-        "Suporte prioritário por email"
+        "Múltiplas curvas por análise",
+        "Confidence intervals (95% CI)",
+        "Optimal cutoff (Youden index)",
+        "Comparação estatística (DeLong)",
+        "Templates por especialidade",
+        "Exportação publication-ready",
+        "Relatórios automáticos",
+        "Suporte prioritário"
       ],
-      buttonText: "Começar Agora",
+      buttonText: "Upgrade para Pro",
       buttonVariant: "default" as const,
-      popular: true
+      popular: true,
+      badge: "MAIS POPULAR"
     }
   ];
 
@@ -110,9 +135,22 @@ const Pricing = () => {
             </Link>
           </nav>
 
-          <Link to="/Auth">
-            <Button>Entrar</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden md:block">
+                  Olá, {user.user_metadata?.full_name || user.email}
+                </span>
+                <Link to="/dashboard">
+                  <Button variant="outline">Dashboard</Button>
+                </Link>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button>Entrar</Button>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -120,10 +158,11 @@ const Pricing = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Análise Estatística Poderosa, Simplificada para Pesquisa Médica
+            ROC/AUC Científico a Preço Justo
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Escolha o plano que melhor se adapta às suas necessidades de pesquisa e comece a tomar decisões baseadas em dados com confiança. Todos os planos são seguros e construídos para profissionais.
+            Alternativa acessível ao GraphPad Prism. Confidence intervals, comparação de curvas e exportação publication-ready. 
+            <strong>Gratuito para sempre</strong> ou Pro por apenas R$19/mês.
           </p>
         </div>
       </section>
@@ -132,21 +171,24 @@ const Pricing = () => {
       <section className="py-16 px-4 bg-muted/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Escolha Seu Plano</h2>
+            <h2 className="text-4xl font-bold mb-4">Preços Honestos</h2>
             <p className="text-muted-foreground text-lg">
-              Preços simples e transparentes para equipes de todos os tamanhos.
+              Sem pegadinhas. Gratuito para sempre ou Pro acessível. 
+              <strong>GraphPad custa $395</strong> - nós cobramos R$19/mês.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan) => (
               <Card 
                 key={plan.name} 
                 className={`relative ${plan.popular ? 'border-primary border-2 shadow-lg' : ''}`}
               >
-                {plan.popular && (
+                {(plan.popular || plan.badge) && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground">Mais Popular</Badge>
+                    <Badge className="bg-primary text-primary-foreground">
+                      {plan.badge || "Mais Popular"}
+                    </Badge>
                   </div>
                 )}
                 
@@ -167,6 +209,9 @@ const Pricing = () => {
                     onClick={() => {
                       if (plan.priceId) {
                         handleSubscribe(plan.priceId);
+                      } else {
+                        // Redirect to signup for free plan
+                        window.location.href = '/auth';
                       }
                     }}
                     disabled={loading}
@@ -223,9 +268,19 @@ const Pricing = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Junte-se a milhares de profissionais médicos que confiam no StatCalc Pro para análise de dados precisa, eficiente e segura.
           </p>
-          <Button size="lg" className="text-lg px-8">
-            Comece Seu Teste Gratuito Hoje
-          </Button>
+          {user ? (
+            <Link to="/dashboard">
+              <Button size="lg" className="text-lg px-8">
+                Ir para Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/auth">
+              <Button size="lg" className="text-lg px-8">
+                Comece Seu Teste Gratuito Hoje
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 

@@ -1,8 +1,48 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, AlertTriangle, FileText, Calculator } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, AlertTriangle, FileText, Calculator, Play, XCircle } from "lucide-react";
+import { ScientificValidator, ValidationResult } from '@/lib/scientificValidation';
 
 const Validation = () => {
+  const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
+  const [isRunning, setIsRunning] = useState(false);
+  const [validationReport, setValidationReport] = useState<string>('');
+
+  const runValidation = async () => {
+    setIsRunning(true);
+    try {
+      const results = await ScientificValidator.runValidation();
+      setValidationResults(results);
+      
+      const report = ScientificValidator.generateValidationReport(results);
+      setValidationReport(report);
+    } catch (error) {
+      console.error('Erro na validação:', error);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const downloadReport = () => {
+    if (!validationReport) return;
+    
+    const blob = new Blob([validationReport], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'validacao-cientifica-statcalc-pro.md';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const passRate = validationResults.length > 0 
+    ? (validationResults.filter(r => r.status === 'PASS').length / validationResults.length) * 100
+    : 0;
+
   const validationTests = [
     {
       test: "Cálculo de Sensibilidade",
@@ -38,57 +78,145 @@ const Validation = () => {
         </p>
       </div>
 
-      {/* Validação de Cálculos */}
+      {/* Executar Validação */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
-            Validação dos Cálculos
+            Validação Científica Automatizada
           </CardTitle>
           <CardDescription>
-            Comparação com cálculos manuais e outras ferramentas estatísticas
+            Testes com datasets conhecidos da literatura científica
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-3">Métrica</th>
-                  <th className="text-left p-3">Cálculo Manual</th>
-                  <th className="text-left p-3">StatCalc Pro</th>
-                  <th className="text-left p-3">Status</th>
-                  <th className="text-left p-3">Fórmula</th>
-                </tr>
-              </thead>
-              <tbody>
-                {validationTests.map((test, i) => (
-                  <tr key={i} className="border-b">
-                    <td className="p-3 font-medium">{test.test}</td>
-                    <td className="p-3 font-mono">{test.manual}</td>
-                    <td className="p-3 font-mono">{test.statcalc}</td>
-                    <td className="p-3">
-                      <Badge variant="default" className="bg-green-100 text-green-800">
-                        {test.status}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm text-muted-foreground">{test.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <span className="font-semibold text-green-800">Validação Completa</span>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                Executa testes com datasets de Hanley & McNeil (1982), DeLong et al. (1988) e Pepe (2003)
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Compara resultados com valores publicados em papers peer-reviewed
+              </p>
             </div>
-            <p className="text-sm text-green-700">
-              Todos os cálculos foram validados contra implementações manuais e ferramentas como R, SPSS e Excel.
-              Os algoritmos seguem as diretrizes da literatura científica estabelecida.
-            </p>
+            <div className="flex gap-2">
+              <Button 
+                onClick={runValidation} 
+                disabled={isRunning}
+                size="lg"
+              >
+                <Play className="mr-2 h-4 w-4" />
+                {isRunning ? 'Executando...' : 'Executar Validação'}
+              </Button>
+              {validationReport && (
+                <Button 
+                  variant="outline"
+                  onClick={downloadReport}
+                  size="lg"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Baixar Relatório
+                </Button>
+              )}
+            </div>
           </div>
+
+          {validationResults.length > 0 && (
+            <>
+              <div className={`p-4 rounded-lg border mb-4 ${
+                passRate >= 90 ? 'bg-green-50 border-green-200' : 
+                passRate >= 80 ? 'bg-yellow-50 border-yellow-200' : 
+                'bg-red-50 border-red-200'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {passRate >= 90 ? (
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    ) : passRate >= 80 ? (
+                      <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-600" />
+                    )}
+                    <span className="font-semibold">
+                      {validationResults.filter(r => r.status === 'PASS').length}/{validationResults.length} Testes Aprovados
+                    </span>
+                  </div>
+                  <Badge variant={passRate >= 90 ? 'default' : passRate >= 80 ? 'secondary' : 'destructive'}>
+                    {passRate.toFixed(1)}%
+                  </Badge>
+                </div>
+                <p className="text-sm mt-2">
+                  {passRate >= 90 
+                    ? '✅ Excelente concordância com literatura científica'
+                    : passRate >= 80 
+                    ? '⚠️ Boa concordância, alguns ajustes podem ser necessários'
+                    : '❌ Discrepâncias identificadas, revisão recomendada'
+                  }
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {validationResults.map((result, index) => (
+                  <div key={index} className="p-4 border rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        {result.status === 'PASS' ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-600" />
+                        )}
+                        <div>
+                          <h4 className="font-medium">{result.dataset}</h4>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            AUC Esperada: {result.expected_auc.toFixed(3)} | 
+                            AUC Calculada: {result.calculated_auc.toFixed(3)} | 
+                            Diferença: {result.difference.toFixed(4)}
+                          </div>
+                        </div>
+                      </div>
+                      <Badge variant={result.status === 'PASS' ? 'default' : 'destructive'}>
+                        {result.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {result.reference}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {validationResults.length === 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3">Métrica</th>
+                    <th className="text-left p-3">Cálculo Manual</th>
+                    <th className="text-left p-3">StatCalc Pro</th>
+                    <th className="text-left p-3">Status</th>
+                    <th className="text-left p-3">Fórmula</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {validationTests.map((test, i) => (
+                    <tr key={i} className="border-b">
+                      <td className="p-3 font-medium">{test.test}</td>
+                      <td className="p-3 font-mono">{test.manual}</td>
+                      <td className="p-3 font-mono">{test.statcalc}</td>
+                      <td className="p-3">
+                        <Badge variant="default" className="bg-green-100 text-green-800">
+                          {test.status}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-sm text-muted-foreground">{test.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
 

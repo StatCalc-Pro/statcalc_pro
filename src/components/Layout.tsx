@@ -30,13 +30,13 @@ const Layout = ({ children }: LayoutProps) => {
             <span className="text-xl font-bold text-foreground">StatCalc Pro</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-4">
             <Link to="/dashboard">
               <Button
                 variant={isActive("/dashboard") ? "default" : "ghost"}
                 className="font-medium"
               >
-                Painel
+                Início
               </Button>
             </Link>
             <Link to="/calculator">
@@ -63,6 +63,14 @@ const Layout = ({ children }: LayoutProps) => {
                 Ajuda
               </Button>
             </Link>
+            <Link to="/validation">
+              <Button
+                variant={isActive("/validation") ? "default" : "ghost"}
+                className="font-medium"
+              >
+                Validação
+              </Button>
+            </Link>
             <Link to="/about">
               <Button
                 variant={isActive("/about") ? "default" : "ghost"}
@@ -73,7 +81,7 @@ const Layout = ({ children }: LayoutProps) => {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {user && isFeatureEnabled('SHOW_PLAN_BADGES') && (
               <div className="flex items-center gap-2 mr-2">
                 <Badge variant={userPlan.type === 'free' ? 'secondary' : userPlan.type === 'god_master' ? 'destructive' : 'default'}>
@@ -83,7 +91,7 @@ const Layout = ({ children }: LayoutProps) => {
                    userPlan.type === 'god_master' ? 'GOD MASTER' : userPlan.type}
                 </Badge>
                 <span className="text-sm text-muted-foreground hidden md:block">
-                  {user.email}
+                  {user.user_metadata?.full_name || user.email}
                 </span>
               </div>
             )}
