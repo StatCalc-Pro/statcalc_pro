@@ -1,4 +1,6 @@
 import { useState, useRef } from "react";
+import { Loader2 } from "lucide-react";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileUp, X, Sparkles, BarChart3, Download, Crown } from "lucide-react";
@@ -16,10 +18,12 @@ import { getUpgradeMessage } from "@/lib/subscription";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 
 const Calculator = () => {
+  useScrollToTop();
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [analysisName, setAnalysisName] = useState<string>("");
   const [pendingResult, setPendingResult] = useState<any | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const { userPlan, canCreateAnalysis, incrementUsage } = useSubscription();
@@ -99,7 +103,7 @@ const Calculator = () => {
     }
   };
 
-  const handleProcess = () => {
+  const handleProcess = async () => {
     // Verificar se pode criar análise (apenas se limitações estiverem ativas)
     if (isFeatureEnabled('ENABLE_SUBSCRIPTION_LIMITS') && !canCreateAnalysis(userPlan)) {
       setShowUpgradeModal(true);
@@ -117,6 +121,11 @@ const Calculator = () => {
       toast.error("Nenhum resultado disponível. Faça upload primeiro.");
       return;
     }
+
+    setIsProcessing(true);
+    
+    // Simular processamento com delay para mostrar loading
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // build session payload using possibly edited name
     const date = new Date().toISOString().split("T")[0];
@@ -148,7 +157,8 @@ const Calculator = () => {
       incrementUsage();
     }
     
-    toast.success("Processamento salvo");
+    setIsProcessing(false);
+    toast.success("Processamento concluído!");
     // clear pending result and navigate
     setPendingResult(null);
     navigate("/results");
@@ -252,9 +262,18 @@ const Calculator = () => {
                 <Input value={analysisName} onChange={(e) => setAnalysisName(e.target.value)} />
               </div>
               <div className="mt-4 flex justify-end">
-                <Button onClick={handleProcess} size="lg">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Processar Dados
+                <Button onClick={handleProcess} size="lg" disabled={isProcessing}>
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Processar Dados
+                    </>
+                  )}
                 </Button>
               </div>
             </CardContent>

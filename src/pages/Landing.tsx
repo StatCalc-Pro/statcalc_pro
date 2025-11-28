@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, BarChart3, ArrowRight, Zap, Shield, Users } from "lucide-react";
+import { Check, BarChart3, ArrowRight, Zap, Shield, Users, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
@@ -68,7 +68,7 @@ const Landing = () => {
       <section className="py-24 px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <Badge className="mb-6" variant="secondary">
-            ✨ Alternativa ao GraphPad Prism
+            <Sparkles className="h-4 w-4 mr-2" />Alternativa ao GraphPad Prism
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             Análise ROC/AUC

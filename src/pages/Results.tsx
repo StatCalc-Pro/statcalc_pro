@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileImage, FileSpreadsheet, FileText, Search } from "lucide-react";
+import { FileImage, FileSpreadsheet, FileText, Search, TrendingUp, Microscope, Scale, Scissors, Target, Lock, Rocket, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeModal } from "@/components/UpgradeModal";
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/table";
 
 const Results = () => {
+  useScrollToTop();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [studies, setStudies] = useState<any[]>([]);
@@ -187,22 +189,28 @@ const Results = () => {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-6 h-12">
           <TabsTrigger value="overview" className="flex items-center gap-2">
-            📊 Resumo
+            <BarChart3 className="h-4 w-4" />
+            Resumo
           </TabsTrigger>
           <TabsTrigger value="chart" className="flex items-center gap-2">
-            📈 Gráfico
+            <TrendingUp className="h-4 w-4" />
+            Gráfico
           </TabsTrigger>
           <TabsTrigger value="data" className="flex items-center gap-2">
-            📋 Dados
+            <FileText className="h-4 w-4" />
+            Dados
           </TabsTrigger>
           <TabsTrigger value="advanced" className="flex items-center gap-2">
-            🔬 Científico
+            <Microscope className="h-4 w-4" />
+            Científico
           </TabsTrigger>
           <TabsTrigger value="compare" className="flex items-center gap-2">
-            ⚖️ Comparar
+            <Scale className="h-4 w-4" />
+            Comparar
           </TabsTrigger>
           <TabsTrigger value="cutoff" className="flex items-center gap-2">
-            ✂️ Cutoff
+            <Scissors className="h-4 w-4" />
+            Cutoff
           </TabsTrigger>
         </TabsList>
 
@@ -210,7 +218,10 @@ const Results = () => {
           {/* Performance Visual */}
           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
             <CardHeader>
-              <CardTitle className="text-center text-xl">🎯 Performance do Teste Diagnóstico</CardTitle>
+              <CardTitle className="text-center text-xl flex items-center justify-center gap-2">
+                <Target className="h-5 w-5" />
+                Performance do Teste Diagnóstico
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center mb-6">
@@ -249,7 +260,7 @@ const Results = () => {
                   {!hasFeature('detailed_metrics') && (
                     <div className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                       <Button size="sm" variant="outline" onClick={() => setShowUpgradeModal(true)}>
-                        🔒 Pro
+                        <Lock className="h-3 w-3 mr-1" />Pro
                       </Button>
                     </div>
                   )}
@@ -266,7 +277,7 @@ const Results = () => {
                   {!hasFeature('detailed_metrics') && (
                     <div className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                       <Button size="sm" variant="outline" onClick={() => setShowUpgradeModal(true)}>
-                        🔒 Pro
+                        <Lock className="h-3 w-3 mr-1" />Pro
                       </Button>
                     </div>
                   )}
@@ -296,7 +307,7 @@ const Results = () => {
                   <p className="text-sm text-gray-600 mb-2">• Pontos clicáveis e informativos</p>
                   <p className="text-sm text-gray-600 mb-6">• Exportação para publicações</p>
                   <Button onClick={() => setShowUpgradeModal(true)} size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600">
-                    🚀 Desbloquear Visualização
+                    <Rocket className="h-4 w-4 mr-2" />Desbloquear Visualização
                   </Button>
                 </div>
               </div>
@@ -304,7 +315,7 @@ const Results = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  📈 Curva ROC Interativa
+                  <TrendingUp className="h-4 w-4 mr-2" />Curva ROC Interativa
                   {hasFeature('roc_chart') && <Badge className="bg-blue-100 text-blue-700">HD</Badge>}
                 </span>
                 <Button size="sm" variant="outline" onClick={() => {
@@ -368,7 +379,7 @@ const Results = () => {
             {!hasFeature('detailed_data') && (
               <div className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                 <div className="text-center">
-                  <div className="text-lg font-medium text-muted-foreground mb-2">📋 Dados Detalhados</div>
+                  <div className="text-lg font-medium text-muted-foreground mb-2"><FileText className="h-4 w-4 mr-2" />Dados Detalhados</div>
                   <p className="text-sm text-muted-foreground mb-4">Tabela completa com busca e filtros</p>
                   <Button onClick={() => setShowUpgradeModal(true)}>
                     Acessar Dados Completos
@@ -445,7 +456,7 @@ const Results = () => {
               {!hasFeature('advanced_metrics') && (
                 <div className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                   <div className="text-center">
-                    <div className="text-lg font-medium text-muted-foreground mb-2">🔬 Métricas Científicas Avançadas</div>
+                    <div className="text-lg font-medium text-muted-foreground mb-2"><Microscope className="h-4 w-4 mr-2" />Métricas Científicas Avançadas</div>
                     <p className="text-sm text-muted-foreground mb-2">• Intervalos de Confiança (95% CI)</p>
                     <p className="text-sm text-muted-foreground mb-2">• Teste de Significância (p-valor)</p>
                     <p className="text-sm text-muted-foreground mb-4">• Ponto de Corte Ótimo (Youden)</p>
@@ -456,7 +467,7 @@ const Results = () => {
                 </div>
               )}
               <CardHeader>
-                <CardTitle className="text-lg">📊 Métricas Estatísticas Avançadas</CardTitle>
+                <CardTitle className="text-lg"><BarChart3 className="h-4 w-4 mr-2" />Métricas Estatísticas Avançadas</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -498,7 +509,7 @@ const Results = () => {
             {!hasFeature('curve_comparison') && (
               <div className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                 <div className="text-center">
-                  <div className="text-lg font-medium text-muted-foreground mb-2">📈 Comparação de Curvas (DeLong Test)</div>
+                  <div className="text-lg font-medium text-muted-foreground mb-2"><TrendingUp className="h-4 w-4 mr-2" />Comparação de Curvas (DeLong Test)</div>
                   <p className="text-sm text-muted-foreground mb-4">Compare múltiplas curvas ROC com teste estatístico</p>
                   <Button onClick={() => setShowUpgradeModal(true)}>
                     Desbloquear Comparação
@@ -515,7 +526,7 @@ const Results = () => {
             {!hasFeature('optimal_cutoff') && (
               <div className="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                 <div className="text-center">
-                  <div className="text-lg font-medium text-muted-foreground mb-2">✂️ Ponto de Corte Ótimo</div>
+                  <div className="text-lg font-medium text-muted-foreground mb-2"><Scissors className="h-4 w-4 mr-2" />Ponto de Corte Ótimo</div>
                   <p className="text-sm text-muted-foreground mb-2">• Índice de Youden</p>
                   <p className="text-sm text-muted-foreground mb-2">• Sensibilidade Fixa</p>
                   <p className="text-sm text-muted-foreground mb-4">• Especificidade Fixa</p>

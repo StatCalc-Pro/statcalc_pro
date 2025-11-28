@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { isFeatureEnabled } from "@/lib/featureFlags";
 
 const Dashboard = () => {
+  useScrollToTop();
   const { userPlan } = useSubscription();
   // Load recent analyses from localStorage/history (fallback to sessionStorage)
   const [history, setHistory] = useState<any[]>([]);

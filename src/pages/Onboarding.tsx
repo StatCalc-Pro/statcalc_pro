@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Upload, BarChart3, Download, ArrowRight, ArrowLeft } from "lucide-react";
+import { CheckCircle, Upload, BarChart3, Download, ArrowRight, ArrowLeft, Lightbulb, Target, FileSpreadsheet, FileImage, FileText } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Onboarding = () => {
@@ -73,7 +73,7 @@ const Onboarding = () => {
           </Card>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-800 mb-2">💡 Dica</h4>
+            <h4 className="font-semibold text-blue-800 mb-2"><Lightbulb className="h-4 w-4 mr-2" />Dica</h4>
             <p className="text-blue-700 text-sm">
               Nosso sistema aceita variações nos nomes das colunas (ex: "VP", "FP", "VN", "FN"), 
               mas usar os nomes exatos evita problemas.
@@ -124,7 +124,7 @@ const Onboarding = () => {
               <CardContent>
                 <div className="w-full h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <div className="text-center">
-                    <div className="text-3xl mb-2">📈</div>
+                    <TrendingUp className="h-8 w-8 mb-2 mx-auto text-primary" />
                     <div className="text-sm text-muted-foreground">Curva ROC Interativa</div>
                   </div>
                 </div>
@@ -161,7 +161,7 @@ const Onboarding = () => {
           <div className="grid md:grid-cols-3 gap-4">
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl mb-2">📊</div>
+                <FileSpreadsheet className="h-8 w-8 mb-2 mx-auto text-primary" />
                 <h4 className="font-semibold mb-2">Excel (.xlsx)</h4>
                 <p className="text-sm text-muted-foreground">
                   Dados completos com todas as métricas calculadas
@@ -171,7 +171,7 @@ const Onboarding = () => {
 
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl mb-2">📄</div>
+                <FileText className="h-8 w-8 mb-2 mx-auto text-primary" />
                 <h4 className="font-semibold mb-2">CSV</h4>
                 <p className="text-sm text-muted-foreground">
                   Formato universal para análises adicionais
@@ -181,7 +181,7 @@ const Onboarding = () => {
 
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-3xl mb-2">🖼️</div>
+                <FileImage className="h-8 w-8 mb-2 mx-auto text-primary" />
                 <h4 className="font-semibold mb-2">PNG</h4>
                 <p className="text-sm text-muted-foreground">
                   Gráfico ROC em alta qualidade para publicações
@@ -191,7 +191,7 @@ const Onboarding = () => {
           </div>
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h4 className="font-semibold text-green-800 mb-2">🎯 Pronto para Publicar</h4>
+            <h4 className="font-semibold text-green-800 mb-2"><Target className="h-4 w-4 mr-2" />Pronto para Publicar</h4>
             <p className="text-green-700 text-sm">
               Todos os resultados são formatados seguindo padrões científicos, 
               prontos para serem incluídos em artigos e apresentações.
