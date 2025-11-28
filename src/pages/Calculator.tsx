@@ -9,7 +9,7 @@ import { computeMetrics, exportResultsJson } from "@/lib/metrics";
 import { calculateAdvancedROC, bootstrapConfidenceInterval } from "@/lib/advancedMetrics";
 import { RobustParser } from "@/lib/robustParser";
 import { Input } from "@/components/ui/input";
-import { generateMockData } from "@/lib/mockGenerator";
+
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { getUpgradeMessage } from "@/lib/subscription";
@@ -201,16 +201,20 @@ const Calculator = () => {
                   variant="secondary" 
                   size="lg"
                   onClick={() => {
-                    try {
-                      const fileName = generateMockData();
-                      toast.success(`Planilha mock gerada: ${fileName}`);
-                    } catch (error) {
-                      toast.error("Erro ao gerar planilha mock");
-                    }
+                    const templateData = [
+                      { id: "estudo_1", tp: "", fp: "", tn: "", fn: "" },
+                      { id: "estudo_2", tp: "", fp: "", tn: "", fn: "" },
+                      { id: "estudo_3", tp: "", fp: "", tn: "", fn: "" }
+                    ];
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(templateData);
+                    XLSX.utils.book_append_sheet(wb, ws, "Template");
+                    XLSX.writeFile(wb, "template_statcalc.xlsx");
+                    toast.success("Template baixado: template_statcalc.xlsx");
                   }}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Gerar Dados Mock
+                  Baixar Template
                 </Button>
               </div>
             </div>

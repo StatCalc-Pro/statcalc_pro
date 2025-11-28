@@ -242,19 +242,7 @@ const Results = () => {
                 </div>
               </div>
               
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
-                     className={`${
-                       summary.auc >= 0.9 ? 'bg-green-100 text-green-800' : 
-                       summary.auc >= 0.8 ? 'bg-blue-100 text-blue-800' : 
-                       summary.auc >= 0.7 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                     }`}>
-                  {summary.auc >= 0.9 ? '🟢 Excelente' : 
-                   summary.auc >= 0.8 ? '🔵 Boa' : 
-                   summary.auc >= 0.7 ? '🟡 Moderada' : 
-                   summary.auc >= 0.6 ? '🟠 Fraca' : '🔴 Inadequada'} Performance
-                </div>
-              </div>
+
 
               <div className="grid grid-cols-2 gap-4">
                 <div className={`p-4 rounded-lg border-2 ${hasFeature('detailed_metrics') ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200 relative'}`}>
@@ -294,60 +282,7 @@ const Results = () => {
             </CardContent>
           </Card>
 
-          {/* Interpretação Clínica */}
-          {summary.auc && (
-            <Card className={`border-2 ${hasFeature('clinical_interpretation') ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200' : 'bg-gray-50 border-gray-200 relative'}`}>
-              {!hasFeature('clinical_interpretation') && (
-                <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
-                  <div className="text-center p-6">
-                    <div className="text-4xl mb-3">🧠</div>
-                    <div className="text-lg font-semibold text-gray-700 mb-2">Interpretação Clínica IA</div>
-                    <p className="text-sm text-gray-600 mb-4">Análise automática com recomendações médicas</p>
-                    <Button onClick={() => setShowUpgradeModal(true)} className="bg-gradient-to-r from-purple-600 to-pink-600">
-                      🚀 Desbloquear Pro
-                    </Button>
-                  </div>
-                </div>
-              )}
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  🧠 Interpretação Clínica Inteligente
-                  {hasFeature('clinical_interpretation') && <Badge className="bg-purple-100 text-purple-700">IA</Badge>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {hasFeature('clinical_interpretation') && summary.avg_sensitivity && summary.avg_specificity && (() => {
-                  const interpretation = ClinicalInterpreter.interpretROC(
-                    summary.auc,
-                    summary.avg_sensitivity,
-                    summary.avg_specificity
-                  );
-                  return (
-                    <div className="space-y-4">
-                      <div className="p-4 bg-white rounded-lg border border-purple-200">
-                        <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                          💡 Resumo Executivo
-                        </h4>
-                        <p className="text-sm text-purple-800">{interpretation.overall}</p>
-                      </div>
-                      <div className="p-4 bg-white rounded-lg border border-purple-200">
-                        <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
-                          🏥 Recomendação Clínica
-                        </h4>
-                        <p className="text-sm text-purple-800">{interpretation.clinicalUse}</p>
-                      </div>
-                    </div>
-                  );
-                })()}
-                {!hasFeature('clinical_interpretation') && (
-                  <div className="space-y-3 opacity-30">
-                    <p className="text-sm blur-sm">💡 O teste apresenta boa capacidade discriminatória com AUC = 0.850...</p>
-                    <p className="text-sm blur-sm">🏥 Adequado para triagem inicial com confirmação...</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+
         </TabsContent>
 
         <TabsContent value="chart">
@@ -546,16 +481,7 @@ const Results = () => {
                     <div className="text-xs text-green-500">PPV: {(summary.advanced.optimal_cutoff.ppv * 100).toFixed(1)}%</div>
                   </div>
                 </div>
-                <div className="mt-4 p-3 bg-white rounded border border-green-200">
-                  <h4 className="font-semibold text-green-900 mb-2">Interpretação Científica</h4>
-                  <p className="text-sm text-gray-700">
-                    {summary.advanced.auc >= 0.9 ? '✅ Excelente capacidade discriminatória' :
-                     summary.advanced.auc >= 0.8 ? '✅ Boa capacidade discriminatória' :
-                     summary.advanced.auc >= 0.7 ? '⚠️ Capacidade discriminatória aceitável' :
-                     '❌ Capacidade discriminatória inadequada'}
-                    {summary.advanced.p_value < 0.05 ? ' com significância estatística.' : ' sem significância estatística.'}
-                  </p>
-                </div>
+
               </CardContent>
             </Card>
           ) : (

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, FileUp, BarChart3, FileText, TrendingUp, Crown, Trash2, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackEvent } from "@/lib/vercel-analytics";
-import { generateMockData } from "@/lib/mockGenerator";
+
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { isFeatureEnabled } from "@/lib/featureFlags";
@@ -165,22 +165,7 @@ const Dashboard = () => {
                 <ArrowRight className="ml-auto h-4 w-4" />
               </Button>
             </Link>
-            <Button 
-              variant="secondary" 
-              className="w-full justify-start gap-2" 
-              size="lg"
-              onClick={() => {
-                try {
-                  const fileName = generateMockData();
-                  toast.success(`Planilha mock gerada: ${fileName}`);
-                } catch (error) {
-                  toast.error("Erro ao gerar planilha mock");
-                }
-              }}
-            >
-              <Download className="h-5 w-5" />
-              Gerar Dados Mock
-            </Button>
+
           </CardContent>
         </Card>
 
